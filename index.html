@@ -169,9 +169,58 @@ body{background:var(--bg);color:var(--tp);font-family:-apple-system,'Segoe UI',I
 ::-webkit-scrollbar-thumb{background:var(--s3);border-radius:3px}
 @media(max-width:1100px){.g4{grid-template-columns:repeat(2,1fr)}.chero{grid-template-columns:repeat(2,1fr)}.vcards{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:768px){.g4,.g3,.g2,.chero,.vcards{grid-template-columns:1fr}.hdr-name{font-size:24px}.mv{font-size:20px}}
+
+/* ── PASSWORD SCREEN ── */
+#auth-screen{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0A0E1A 0%,#0F1929 50%,#0A0E1A 100%)}
+.auth-box{background:#111827;border:1px solid #2D3748;border-radius:16px;padding:48px 40px;text-align:center;width:360px;max-width:90vw;box-shadow:0 24px 64px rgba(0,0,0,0.6)}
+.auth-logo{font-size:48px;margin-bottom:12px;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+.auth-title{font-size:22px;font-weight:800;color:#E2E8F0;letter-spacing:-.02em;margin-bottom:4px}
+.auth-subtitle{font-size:12px;color:#64748B;text-transform:uppercase;letter-spacing:.12em;margin-bottom:28px}
+.auth-divider{width:40px;height:2px;background:#38BDF8;margin:0 auto 28px;border-radius:2px}
+.auth-input-wrap{position:relative;margin-bottom:14px}
+.auth-input{width:100%;padding:12px 44px 12px 16px;background:#1C2333;border:1px solid #2D3748;border-radius:10px;color:#E2E8F0;font-size:15px;font-family:inherit;outline:none;transition:border-color .2s;text-align:center;letter-spacing:.06em}
+.auth-input:focus{border-color:#38BDF8}
+.auth-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:#64748B;cursor:pointer;font-size:16px}
+.auth-btn{width:100%;padding:12px;background:linear-gradient(135deg,#0284C7,#38BDF8);border:none;border-radius:10px;color:white;font-size:14px;font-weight:700;cursor:pointer;transition:opacity .2s;margin-bottom:10px}
+.auth-btn:hover{opacity:.9}
+.auth-error{font-size:12px;color:#F87171;height:18px;transition:opacity .2s}
+.auth-note{font-size:10px;color:#475569;margin-top:20px;line-height:1.6}
+/* ── GOOGLE FIT BUTTON ── */
+.gfit-btn{display:inline-flex;align-items:center;gap:10px;padding:10px 20px;background:#FFFFFF;border:none;border-radius:8px;font-size:13px;font-weight:600;color:#3c4043;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.3);transition:box-shadow .2s}
+body.light .gfit-btn{box-shadow:0 2px 8px rgba(0,0,0,0.15)}
+.gfit-btn:hover{box-shadow:0 4px 16px rgba(0,0,0,0.4)}
+.gfit-btn svg{width:20px;height:20px}
+.gfit-status{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--s2);border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--ts)}
+.gfit-status.connected{border-color:rgba(52,211,153,0.4);background:rgba(52,211,153,0.05)}
+.gfit-dot{width:8px;height:8px;border-radius:50%;background:var(--tm)}
+.gfit-dot.live{background:var(--good);box-shadow:0 0 6px var(--good);animation:blink 2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+.gfit-sync{font-size:11px;color:var(--accent);text-decoration:underline;cursor:pointer;background:none;border:none}
+.gfit-loading{text-align:center;padding:20px;color:var(--tm);font-size:12px}
+
 </style>
 </head>
 <body>
+
+<!-- PASSWORD SCREEN -->
+<div id="auth-screen">
+  <div class="auth-box">
+    <div class="auth-logo">&#129756;</div>
+    <div class="auth-title">Baden Appleyard</div>
+    <div class="auth-subtitle">Health Dashboard</div>
+    <div class="auth-divider"></div>
+    <div class="auth-input-wrap">
+      <input class="auth-input" type="password" id="pwd-input" placeholder="Enter password"
+        onkeydown="if(event.key==='Enter')checkPassword()">
+      <button class="auth-toggle" onclick="togglePwd()" title="Show/hide">&#128065;</button>
+    </div>
+    <button class="auth-btn" onclick="checkPassword()">&#9654; Access Dashboard</button>
+    <div class="auth-error" id="pwd-error"></div>
+    <div class="auth-note">Private health data &#8212; authorised access only.<br>Session is remembered on this device.</div>
+  </div>
+</div>
+
 <header class="hdr">
   <div class="hdr-inner">
     <div class="hdr-row">
@@ -317,10 +366,19 @@ body{background:var(--bg);color:var(--tp);font-family:-apple-system,'Segoe UI',I
 
 <!-- FITNESS -->
 <div id="tp-fitness" class="tp-p">
-  <div class="alert-bar" style="background:rgba(56,189,248,0.06);border-color:rgba(56,189,248,0.2)">
-    <div class="abt" style="color:var(--accent)">&#127939; Google Fit Integration</div>
-    <div class="ai">Connect via Takeout export or log manually below. Data saves locally to your device.</div>
+  <div id="gfit-connect-bar" style="background:rgba(56,189,248,0.06);border:1px solid rgba(56,189,248,0.2);border-radius:var(--r);padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+    <div>
+      <div style="font-size:13px;font-weight:700;color:var(--tp);margin-bottom:3px">&#127939; Google Fit Integration</div>
+      <div id="gfit-status-text" style="font-size:11px;color:var(--ts)">Connect to pull your steps, heart rate, sleep and VO&#8322; max automatically.</div>
+    </div>
+    <div id="gfit-btn-area">
+      <button class="gfit-btn" onclick="connectGoogleFit()">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z" fill="#4285F4"/></svg>
+        Connect Google Fit
+      </button>
+    </div>
   </div>
+
   <div class="g4" style="margin-bottom:18px">
     <div class="fit-stat"><div class="fit-stat-val" id="stat-steps">&#8212;</div><div class="fit-stat-lbl">Steps Today</div><div class="fit-stat-sub">Target: 10,000</div></div>
     <div class="fit-stat"><div class="fit-stat-val" id="stat-hr">&#8212;</div><div class="fit-stat-lbl">Resting HR</div><div class="fit-stat-sub">bpm</div></div>
