@@ -1,9 +1,9 @@
-# Baden Appleyard Health Dashboard
+# Health Dashboard
 
 Personal health monitoring dashboard — deployed via GitHub Pages.
 
 ## Live URL
-**https://badapple71-hash.github.io/health-dashboard/**
+****
 
 ## Features
 - 8 tabs: Overview, Cardiac, Lab Trends, Supplements, Fitness, Trackers, History, Team
