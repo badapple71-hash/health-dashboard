@@ -753,17 +753,37 @@ async function syncGFit() {
         if (window._ft && fC.hr) { fC.hr.data.labels=hrs.map(d=>d.date); fC.hr.data.datasets[0].data=hrs.map(d=>d.v); fC.hr.update(); }
       }
     }
-    // Sleep sessions
-    const slr = await fetch(`https://www.googleapis.com/fitness/v1/users/me/sessions?startTime=${new Date(d30).toISOString()}&endTime=${new Date(now).toISOString()}&activityType=72`,
-      {headers:{'Authorization':'Bearer '+token}});
+    // Sleep — fetch all session types (72=sleep, 109=in_bed) and deduplicate by day
+    const sleepUrl = `https://www.googleapis.com/fitness/v1/users/me/sessions?startTime=${new Date(d30).toISOString()}&endTime=${new Date(now).toISOString()}`;
+    const slr = await fetch(sleepUrl, {headers:{'Authorization':'Bearer '+token}});
     if (slr.ok) {
       const sd2 = await slr.json();
+      const SLEEP_TYPES = new Set([72,109,110,111,112]); // sleep, in_bed, awake, light, deep, REM
       const byDay={};
       (sd2.session||[]).forEach(s=>{
-        const day=new Date(parseInt(s.startTimeMillis)).toLocaleDateString('en-AU',{day:'numeric',month:'short'});
-        byDay[day]=(byDay[day]||0)+(parseInt(s.endTimeMillis)-parseInt(s.startTimeMillis))/3600000;
+        if (!SLEEP_TYPES.has(parseInt(s.activityType))) return;
+        // Only count actual sleep sessions (activityType 72=sleep, 110=light, 111=deep, 112=REM)
+        if (parseInt(s.activityType) === 109) return; // skip in_bed only
+        const dur = (parseInt(s.endTimeMillis)-parseInt(s.startTimeMillis))/3600000;
+        if (dur < 0.1 || dur > 14) return; // skip implausible durations
+        // Use the end time date as the sleep date (morning they woke up)
+        const day = new Date(parseInt(s.endTimeMillis)).toLocaleDateString('en-AU',{day:'numeric',month:'short'});
+        byDay[day] = (byDay[day]||0) + dur;
       });
-      const sleep=Object.entries(byDay).map(([date,v])=>{return{date,v:Math.round(v*10)/10};}).filter(d=>d.v>0&&d.v<14);
+      // If no typed sleep sessions found, fall back to all sessions including in_bed
+      if (!Object.keys(byDay).length) {
+        (sd2.session||[]).forEach(s=>{
+          if (!SLEEP_TYPES.has(parseInt(s.activityType))) return;
+          const dur = (parseInt(s.endTimeMillis)-parseInt(s.startTimeMillis))/3600000;
+          if (dur < 0.5 || dur > 14) return;
+          const day = new Date(parseInt(s.endTimeMillis)).toLocaleDateString('en-AU',{day:'numeric',month:'short'});
+          byDay[day] = Math.max(byDay[day]||0, dur); // take longest session per day
+        });
+      }
+      const sleep = Object.entries(byDay)
+        .map(([date,v])=>({date, v:Math.round(v*10)/10}))
+        .filter(d=>d.v>=1 && d.v<=14)
+        .sort((a,b)=>a.date.localeCompare(b.date));
       if (sleep.length) {
         store.set('fit_sleep', sleep);
         updStat('sleep', sleep[sleep.length-1].v+'h');
