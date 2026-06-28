@@ -2,36 +2,18 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Health Dashboard">
 <link id="manifest-link" rel="manifest">
-<title>Baden Appleyard — Health Dashboard</title>
+<title>Baden Appleyard &mdash; Health Dashboard</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-:root {
-  --bg:#0A0E1A; --s1:#111827; --s2:#1C2333; --s3:#2D3748;
-  --border:#2D3748; --tp:#E2E8F0; --ts:#94A3B8; --tm:#64748B;
-  --accent:#38BDF8; --aglow:rgba(56,189,248,0.12);
-  --good:#34D399; --gbg:rgba(52,211,153,0.1);
-  --warn:#FBBF24; --wbg:rgba(251,191,36,0.1);
-  --bad:#F87171; --rbg:rgba(248,113,113,0.1);
-  --r:12px; --rs:8px; --mono:'JetBrains Mono','Cascadia Code',monospace;
-  --grid-line:rgba(45,55,72,0.7);
-}
-body.light {
-  --bg:#F0F4F8; --s1:#FFFFFF; --s2:#F1F5F9; --s3:#E2E8F0;
-  --border:#CBD5E1; --tp:#0F172A; --ts:#475569; --tm:#94A3B8;
-  --accent:#0284C7; --aglow:rgba(2,132,199,0.08);
-  --good:#059669; --gbg:rgba(5,150,105,0.08);
-  --warn:#D97706; --wbg:rgba(217,119,6,0.08);
-  --bad:#DC2626; --rbg:rgba(220,38,38,0.08);
-  --grid-line:rgba(203,213,225,0.8);
-}
+:root{--bg:#0A0E1A;--s1:#111827;--s2:#1C2333;--s3:#2D3748;--border:#2D3748;--tp:#E2E8F0;--ts:#94A3B8;--tm:#64748B;--accent:#38BDF8;--aglow:rgba(56,189,248,0.12);--good:#34D399;--gbg:rgba(52,211,153,0.1);--warn:#FBBF24;--wbg:rgba(251,191,36,0.1);--bad:#F87171;--rbg:rgba(248,113,113,0.1);--r:12px;--rs:8px;--mono:'JetBrains Mono','Cascadia Code',monospace}
+body.light{--bg:#F0F4F8;--s1:#FFF;--s2:#F1F5F9;--s3:#E2E8F0;--border:#CBD5E1;--tp:#0F172A;--ts:#475569;--tm:#94A3B8;--accent:#0284C7;--aglow:rgba(2,132,199,0.08);--good:#059669;--gbg:rgba(5,150,105,0.08);--warn:#D97706;--wbg:rgba(217,119,6,0.08);--bad:#DC2626;--rbg:rgba(220,38,38,0.08)}
 body.light .hdr{background:linear-gradient(135deg,#EFF6FF 0%,#E0F2FE 40%,#EFF6FF 100%)}
-body.light .ep{stroke:#0284C7;opacity:.35}
-body.light .nav{background:#FFFFFF}
+body.light .ep{stroke:#0284C7;opacity:.3}
+body.light .nav{background:#fff}
 body.light .ecg-wrap::before{background:linear-gradient(to right,#EFF6FF,transparent)}
 body.light .ecg-wrap::after{background:linear-gradient(to left,#EFF6FF,transparent)}
 body.light .wbox{background:rgba(220,38,38,0.05)}
@@ -39,185 +21,189 @@ body.light .chero{background:linear-gradient(135deg,rgba(220,38,38,0.04) 0%,rgba
 body.light .rtbl td{border-bottom-color:rgba(203,213,225,0.6)}
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg);color:var(--tp);font-family:-apple-system,'Segoe UI',Inter,sans-serif;line-height:1.6;min-height:100vh;transition:background .3s,color .3s}
+/* ── AUTH SCREEN ── */
+#auth-screen{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0A0E1A 0%,#0F1929 50%,#0A0E1A 100%)}
+.auth-box{background:#111827;border:1px solid #2D3748;border-radius:16px;padding:44px 36px;text-align:center;width:340px;max-width:90vw;box-shadow:0 24px 64px rgba(0,0,0,0.6)}
+.auth-logo{font-size:44px;margin-bottom:10px;animation:hpulse 2s ease-in-out infinite}
+@keyframes hpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+.auth-title{font-size:20px;font-weight:800;color:#E2E8F0;letter-spacing:-.02em;margin-bottom:3px}
+.auth-sub{font-size:11px;color:#64748B;text-transform:uppercase;letter-spacing:.12em;margin-bottom:24px}
+.auth-bar{width:36px;height:2px;background:#38BDF8;margin:0 auto 24px;border-radius:2px}
+.auth-wrap{position:relative;margin-bottom:12px}
+.auth-inp{width:100%;padding:11px 40px 11px 14px;background:#1C2333;border:1px solid #2D3748;border-radius:9px;color:#E2E8F0;font-size:15px;font-family:inherit;outline:none;transition:border-color .2s;text-align:center;letter-spacing:.05em}
+.auth-inp:focus{border-color:#38BDF8}
+.auth-eye{position:absolute;right:11px;top:50%;transform:translateY(-50%);background:none;border:none;color:#64748B;cursor:pointer;font-size:15px}
+.auth-btn{width:100%;padding:11px;background:linear-gradient(135deg,#0284C7,#38BDF8);border:none;border-radius:9px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .2s;margin-bottom:8px}
+.auth-btn:hover{opacity:.9}
+.auth-err{font-size:11px;color:#F87171;min-height:16px}
+.auth-note{font-size:10px;color:#475569;margin-top:18px;line-height:1.6}
+/* ── HEADER ── */
 .hdr{background:linear-gradient(135deg,#0A0E1A 0%,#0F1929 40%,#0A0E1A 100%);border-bottom:1px solid var(--border);overflow:hidden;transition:background .3s}
-.hdr-inner{max-width:1400px;margin:0 auto;padding:24px 24px 0;position:relative;z-index:2}
-.hdr-row{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:16px}
-.eyebrow{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:5px}
-.hdr-name{font-size:32px;font-weight:800;letter-spacing:-.02em}
-.hdr-sub{font-size:12px;color:var(--ts);margin-top:3px}
-.hdr-right{display:flex;flex-direction:column;align-items:flex-end;gap:10px}
-.hdr-vitals{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start}
+.hdr-inner{max-width:1400px;margin:0 auto;padding:20px 20px 0}
+.hdr-row{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.eyebrow{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:4px}
+.hdr-name{font-size:28px;font-weight:800;letter-spacing:-.02em}
+.hdr-sub{font-size:11px;color:var(--ts);margin-top:2px}
+.hdr-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.hdr-vitals{display:flex;gap:14px;flex-wrap:wrap}
 .vchip{display:flex;flex-direction:column;align-items:flex-end;gap:1px}
 .vchip .lbl{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--tm)}
-.vchip .val{font-family:var(--mono);font-size:17px;font-weight:700}
-.theme-btn{display:flex;align-items:center;gap:7px;padding:7px 14px;background:var(--s2);border:1px solid var(--border);border-radius:20px;font-size:12px;font-weight:600;color:var(--ts);cursor:pointer;transition:all .2s}
+.vchip .val{font-family:var(--mono);font-size:15px;font-weight:700}
+.theme-btn{display:flex;align-items:center;gap:6px;padding:6px 12px;background:var(--s2);border:1px solid var(--border);border-radius:20px;font-size:11px;font-weight:600;color:var(--ts);cursor:pointer;transition:all .2s}
 .theme-btn:hover{border-color:var(--accent);color:var(--accent)}
-.ecg-wrap{width:100%;height:64px;margin-top:12px;overflow:hidden;position:relative}
-.ecg-wrap::before{content:'';position:absolute;left:0;top:0;bottom:0;width:60px;background:linear-gradient(to right,#0A0E1A,transparent);z-index:3}
-.ecg-wrap::after{content:'';position:absolute;right:0;top:0;bottom:0;width:60px;background:linear-gradient(to left,#0A0E1A,transparent);z-index:3}
-.ecg-svg{width:200%;height:64px;animation:ecgs 5s linear infinite}
+.ecg-wrap{width:100%;height:54px;margin-top:10px;overflow:hidden;position:relative}
+.ecg-wrap::before{content:'';position:absolute;left:0;top:0;bottom:0;width:50px;background:linear-gradient(to right,#0A0E1A,transparent);z-index:3}
+.ecg-wrap::after{content:'';position:absolute;right:0;top:0;bottom:0;width:50px;background:linear-gradient(to left,#0A0E1A,transparent);z-index:3}
+.ecg-svg{width:200%;height:54px;animation:ecgs 5s linear infinite}
 @keyframes ecgs{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
-.ep{fill:none;stroke:var(--accent);stroke-width:1.5;opacity:.5;transition:stroke .3s}
+.ep{fill:none;stroke:var(--accent);stroke-width:1.5;opacity:.5}
+/* ── NAV ── */
 .nav{background:var(--s1);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;transition:background .3s}
-.nav-i{max-width:1400px;margin:0 auto;padding:0 24px;display:flex;gap:0;overflow-x:auto;scrollbar-width:none}
+.nav-i{max-width:1400px;margin:0 auto;padding:0 20px;display:flex;overflow-x:auto;scrollbar-width:none}
 .nav-i::-webkit-scrollbar{display:none}
-.ntab{padding:13px 20px;font-size:12px;font-weight:500;color:var(--ts);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.ntab{padding:11px 16px;font-size:11px;font-weight:500;color:var(--ts);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap}
 .ntab:hover{color:var(--tp)}.ntab.active{color:var(--accent);border-bottom-color:var(--accent)}
-.main{max-width:1400px;margin:0 auto;padding:20px}
+/* ── LAYOUT ── */
+.main{max-width:1400px;margin:0 auto;padding:16px}
 .tp-p{display:none}.tp-p.active{display:block}
-.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
-.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
-.g2{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:18px}
-.card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:17px;transition:background .3s,border-color .3s}
-.ctitle{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--tm);font-weight:700;margin-bottom:11px;display:flex;align-items:center;gap:6px}
-.mc{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:17px;display:flex;flex-direction:column;gap:6px;position:relative;overflow:hidden;transition:background .3s}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.g2{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
+/* ── CARDS ── */
+.card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:14px;transition:background .3s}
+.ctitle{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--tm);font-weight:700;margin-bottom:10px}
+.mc{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:5px;position:relative;overflow:hidden}
 .mc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--r) var(--r) 0 0}
-.mc.good::before{background:var(--good)}.mc.warn::before{background:var(--warn)}
-.mc.bad::before{background:var(--bad)}.mc.info::before{background:var(--accent)}
+.mc.good::before{background:var(--good)}.mc.warn::before{background:var(--warn)}.mc.bad::before{background:var(--bad)}.mc.info::before{background:var(--accent)}
 .ml{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--tm);font-weight:700}
-.mv{font-family:var(--mono);font-size:24px;font-weight:800;color:var(--tp);line-height:1}
-.mu{font-size:12px;color:var(--ts);font-family:var(--mono)}
-.mt{font-size:11px;color:var(--tm)}
-.mbadge{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;width:fit-content;margin-top:1px}
-.mbadge.good{background:var(--gbg);color:var(--good)}.mbadge.warn{background:var(--wbg);color:var(--warn)}
-.mbadge.bad{background:var(--rbg);color:var(--bad)}.mbadge.info{background:var(--aglow);color:var(--accent)}
-.alert-bar{background:rgba(251,191,36,0.07);border:1px solid rgba(251,191,36,0.25);border-radius:var(--r);padding:12px 16px;margin-bottom:18px;display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center}
+.mv{font-family:var(--mono);font-size:22px;font-weight:800;color:var(--tp);line-height:1}
+.mu{font-size:11px;color:var(--ts);font-family:var(--mono)}
+.mt{font-size:10px;color:var(--tm)}
+.mbadge{display:inline-flex;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:700;width:fit-content;margin-top:1px}
+.mbadge.good{background:var(--gbg);color:var(--good)}.mbadge.warn{background:var(--wbg);color:var(--warn)}.mbadge.bad{background:var(--rbg);color:var(--bad)}.mbadge.info{background:var(--aglow);color:var(--accent)}
+/* ── ALERTS / BOXES ── */
+.alert-bar{background:rgba(251,191,36,0.07);border:1px solid rgba(251,191,36,0.25);border-radius:var(--r);padding:10px 14px;margin-bottom:14px;display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center}
 .abt{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--warn);font-weight:800}
-.ai{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ts)}
+.ai{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--ts)}
 .adot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
 .adot.w{background:var(--warn)}.adot.r{background:var(--bad)}.adot.g{background:var(--good)}
-.wbox{background:var(--rbg);border:1px solid rgba(248,113,113,0.25);border-radius:var(--r);padding:13px 17px;margin-bottom:18px}
-.wbox-t{font-size:12px;font-weight:800;color:var(--bad);margin-bottom:5px}
-.wbox p{font-size:12px;color:var(--ts);line-height:1.55}
-.wbox strong{color:var(--tp)}
-.cc{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:17px;transition:background .3s}
-.ch{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;flex-wrap:wrap;gap:8px}
-.ct{font-size:13px;font-weight:700;color:var(--tp)}.cs{font-size:11px;color:var(--ts);margin-top:1px}
-.cls{display:flex;gap:12px;flex-wrap:wrap}.cli{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--ts)}
-.cld{width:8px;height:8px;border-radius:50%}
-.cw{position:relative;height:190px}.cw-t{position:relative;height:230px}
-.st{font-size:17px;font-weight:800;color:var(--tp);margin-bottom:13px;display:flex;align-items:center;gap:8px}
-.chero{background:linear-gradient(135deg,rgba(248,113,113,0.06) 0%,rgba(56,189,248,0.04) 100%);border:1px solid rgba(248,113,113,0.18);border-radius:var(--r);padding:20px;margin-bottom:18px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-.cfl{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--tm);font-weight:700;margin-bottom:4px}
-.cfv{font-size:13px;color:var(--tp);line-height:1.4}.cfsub{font-size:11px;color:var(--ts);margin-top:3px}
-.vcards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
-.vc{background:var(--s1);border:1px solid;border-radius:var(--r);padding:16px}
+.wbox{background:var(--rbg);border:1px solid rgba(248,113,113,0.25);border-radius:var(--r);padding:11px 15px;margin-bottom:14px}
+.wbox-t{font-size:11px;font-weight:800;color:var(--bad);margin-bottom:4px}
+.wbox p{font-size:11px;color:var(--ts);line-height:1.55}.wbox strong{color:var(--tp)}
+/* ── CHARTS ── */
+.cc{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:14px}
+.ch{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;flex-wrap:wrap;gap:6px}
+.ct{font-size:12px;font-weight:700;color:var(--tp)}.cs{font-size:10px;color:var(--ts);margin-top:1px}
+.cls{display:flex;gap:10px;flex-wrap:wrap}.cli{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--ts)}
+.cld{width:7px;height:7px;border-radius:50%}
+.cw{position:relative;height:170px}.cw-t{position:relative;height:210px}
+/* ── CARDIAC ── */
+.st{font-size:15px;font-weight:800;color:var(--tp);margin-bottom:12px}
+.chero{background:linear-gradient(135deg,rgba(248,113,113,0.06) 0%,rgba(56,189,248,0.04) 100%);border:1px solid rgba(248,113,113,0.18);border-radius:var(--r);padding:16px;margin-bottom:14px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.cfl{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--tm);font-weight:700;margin-bottom:3px}
+.cfv{font-size:12px;color:var(--tp);line-height:1.4}.cfsub{font-size:10px;color:var(--ts);margin-top:2px}
+.vcards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.vc{background:var(--s1);border:1px solid;border-radius:var(--r);padding:13px}
 .vc.danger{border-color:rgba(248,113,113,0.35)}.vc.caution{border-color:rgba(251,191,36,0.35)}.vc.clear{border-color:rgba(52,211,153,0.35)}
-.vct{font-size:12px;font-weight:700;color:var(--tp);margin-bottom:5px}
-.vcb{font-size:12px;color:var(--ts);line-height:1.6}.vcb div{margin-top:3px}
-.sc{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:17px;display:flex;flex-direction:column;gap:9px}
+.vct{font-size:11px;font-weight:700;color:var(--tp);margin-bottom:4px}
+.vcb{font-size:11px;color:var(--ts);line-height:1.6}.vcb div{margin-top:2px}
+/* ── SUPPLEMENTS ── */
+.sc{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:8px}
 .sh{display:flex;justify-content:space-between;align-items:flex-start}
-.sn{font-size:14px;font-weight:700;color:var(--tp)}.srole{font-size:11px;color:var(--ts);margin-top:1px}
-.sdose{font-family:var(--mono);font-size:11px;color:var(--accent);font-weight:700;padding:3px 8px;background:var(--aglow);border-radius:5px;flex-shrink:0}
-.sdesc{font-size:12px;color:var(--ts);line-height:1.5}
-.sri{font-size:11px;color:var(--tm);display:flex;gap:5px;align-items:flex-start}
-.rtbl{width:100%;border-collapse:collapse;font-size:12px}
-.rtbl th{text-align:left;padding:8px 10px;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--tm);border-bottom:1px solid var(--border)}
-.rtbl td{padding:10px;border-bottom:1px solid rgba(45,55,72,0.5);color:var(--ts);vertical-align:middle}
+.sn{font-size:13px;font-weight:700;color:var(--tp)}.srole{font-size:10px;color:var(--ts);margin-top:1px}
+.sdose{font-family:var(--mono);font-size:10px;color:var(--accent);font-weight:700;padding:2px 7px;background:var(--aglow);border-radius:5px;flex-shrink:0}
+.sdesc{font-size:11px;color:var(--ts);line-height:1.5}
+.sri{font-size:10px;color:var(--tm);display:flex;gap:4px;align-items:flex-start}
+/* ── TABLES ── */
+.rtbl{width:100%;border-collapse:collapse;font-size:11px}
+.rtbl th{text-align:left;padding:7px 9px;font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--tm);border-bottom:1px solid var(--border)}
+.rtbl td{padding:9px;border-bottom:1px solid rgba(45,55,72,0.5);color:var(--ts);vertical-align:middle}
 .rtbl tr:last-child td{border-bottom:none}
-.rtag{display:inline-flex;align-items:center;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:800}
-.rtag.vl{background:var(--gbg);color:var(--good)}.rtag.l{background:rgba(52,211,153,0.06);color:#6ee7b7}
-.rtag.m{background:var(--wbg);color:var(--warn)}
-.tl{position:relative;padding-left:24px}
-.tl::before{content:'';position:absolute;left:5px;top:0;bottom:0;width:1px;background:var(--border)}
-.tli{position:relative;padding-bottom:20px}
-.tli::before{content:'';position:absolute;left:-20px;top:5px;width:9px;height:9px;border-radius:50%;background:var(--s2);border:2px solid var(--border)}
+.rtag{display:inline-flex;padding:1px 6px;border-radius:20px;font-size:9px;font-weight:800}
+.rtag.vl{background:var(--gbg);color:var(--good)}.rtag.l{background:rgba(52,211,153,0.06);color:#6ee7b7}.rtag.m{background:var(--wbg);color:var(--warn)}
+/* ── TIMELINE ── */
+.tl{position:relative;padding-left:20px}
+.tl::before{content:'';position:absolute;left:4px;top:0;bottom:0;width:1px;background:var(--border)}
+.tli{position:relative;padding-bottom:16px}
+.tli::before{content:'';position:absolute;left:-17px;top:4px;width:8px;height:8px;border-radius:50%;background:var(--s2);border:2px solid var(--border)}
 .tli.pos::before{border-color:var(--good);background:var(--gbg)}.tli.con::before{border-color:var(--warn);background:var(--wbg)}
 .tli.med::before{border-color:var(--accent);background:var(--aglow)}.tli.cri::before{border-color:var(--bad);background:var(--rbg)}
-.tdate{font-size:10px;color:var(--tm);font-family:var(--mono);margin-bottom:2px}
-.ttitle{font-size:12px;font-weight:700;color:var(--tp);margin-bottom:3px}
-.tbody{font-size:11px;color:var(--ts);line-height:1.55}
-.dc{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:14px;display:flex;align-items:flex-start;gap:12px}
-.dav{width:38px;height:38px;border-radius:50%;background:var(--aglow);border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
-.dn{font-size:13px;font-weight:700;color:var(--tp)}.dr{font-size:11px;color:var(--accent);font-weight:600}.do{font-size:11px;color:var(--tm);margin-top:1px}
-.ui{display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px solid var(--border)}
+.tdate{font-size:9px;color:var(--tm);font-family:var(--mono);margin-bottom:2px}
+.ttitle{font-size:11px;font-weight:700;color:var(--tp);margin-bottom:2px}
+.tbody{font-size:10px;color:var(--ts);line-height:1.55}
+/* ── DOCTORS / UPCOMING ── */
+.dc{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:12px;display:flex;align-items:flex-start;gap:10px}
+.dav{width:34px;height:34px;border-radius:50%;background:var(--aglow);border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.dn{font-size:12px;font-weight:700;color:var(--tp)}.dr{font-size:10px;color:var(--accent);font-weight:600}.do{font-size:10px;color:var(--tm);margin-top:1px}
+.ui{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
 .ui:last-child{border-bottom:none}
-.udate{font-family:var(--mono);font-size:10px;color:var(--tm);min-width:70px}
-.uico{font-size:15px;flex-shrink:0}.utxt{flex:1;font-size:12px;color:var(--tp)}.usub{font-size:10px;color:var(--ts);margin-top:1px}
-.upri{padding:2px 7px;border-radius:20px;font-size:10px;font-weight:700;flex-shrink:0}
+.udate{font-family:var(--mono);font-size:9px;color:var(--tm);min-width:65px}
+.uico{font-size:14px;flex-shrink:0}.utxt{flex:1;font-size:11px;color:var(--tp)}.usub{font-size:10px;color:var(--ts);margin-top:1px}
+.upri{padding:2px 6px;border-radius:20px;font-size:9px;font-weight:700;flex-shrink:0}
 .upri.r{background:var(--rbg);color:var(--bad)}.upri.w{background:var(--wbg);color:var(--warn)}.upri.b{background:var(--aglow);color:var(--accent)}
-.form-row{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin-bottom:14px}
+/* ── FORMS / FITNESS / TRACKERS ── */
+.form-row{display:flex;gap:7px;align-items:flex-end;flex-wrap:wrap;margin-bottom:11px}
 .fg{display:flex;flex-direction:column;gap:3px}
-.flbl{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--tm);font-weight:700}
-.finp{background:var(--s2);border:1px solid var(--border);border-radius:var(--rs);padding:7px 11px;color:var(--tp);font-size:13px;font-family:var(--mono);min-width:90px;outline:none;transition:border-color .2s}
+.flbl{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--tm);font-weight:700}
+.finp{background:var(--s2);border:1px solid var(--border);border-radius:var(--rs);padding:6px 10px;color:var(--tp);font-size:12px;font-family:var(--mono);min-width:80px;outline:none;transition:border-color .2s}
 .finp:focus{border-color:var(--accent)}
-.fbtn{padding:7px 16px;background:var(--accent);border:none;border-radius:var(--rs);color:white;font-size:12px;font-weight:700;cursor:pointer;opacity:.9;transition:opacity .2s;align-self:flex-end}
-.fbtn:hover{opacity:1}
-.form-section{background:var(--s2);border-radius:var(--r);padding:14px;margin-bottom:14px}
-.form-section-title{font-size:11px;font-weight:700;color:var(--ts);margin-bottom:10px}
-.fit-stat{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:14px;text-align:center}
-.fit-stat-val{font-family:var(--mono);font-size:28px;font-weight:800;color:var(--accent);line-height:1}
-.fit-stat-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--tm);margin-top:4px}
-.fit-stat-sub{font-size:11px;color:var(--ts);margin-top:2px}
-.no-data{text-align:center;padding:30px;color:var(--tm);font-size:13px}
-.no-data-icon{font-size:32px;margin-bottom:8px}
-.rem-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:14px;display:flex;align-items:center;gap:12px;transition:opacity .3s}
+.fbtn{padding:6px 14px;background:var(--accent);border:none;border-radius:var(--rs);color:#fff;font-size:11px;font-weight:700;cursor:pointer;align-self:flex-end}
+.form-section{background:var(--s2);border-radius:var(--r);padding:10px;margin-bottom:10px}
+.fst{font-size:10px;font-weight:700;color:var(--ts);margin-bottom:7px}
+.fit-stat{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:12px;text-align:center}
+.fsv{font-family:var(--mono);font-size:24px;font-weight:800;color:var(--accent);line-height:1}
+.fsl{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--tm);margin-top:3px}
+.fss{font-size:10px;color:var(--ts);margin-top:2px}
+.no-data{text-align:center;padding:22px;color:var(--tm);font-size:11px}
+.nd-icon{font-size:26px;margin-bottom:6px}
+/* ── GOOGLE FIT ── */
+.gfit-bar{background:rgba(56,189,248,0.06);border:1px solid rgba(56,189,248,0.2);border-radius:var(--r);padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.gfit-title{font-size:12px;font-weight:700;color:var(--tp);margin-bottom:2px}
+.gfit-sub{font-size:11px;color:var(--ts)}
+.gfit-connect-btn{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;background:#fff;border:none;border-radius:7px;font-size:12px;font-weight:600;color:#3c4043;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.25);transition:box-shadow .2s}
+.gfit-connect-btn:hover{box-shadow:0 4px 16px rgba(0,0,0,0.35)}
+.gfit-connected{font-size:11px;color:var(--good);display:flex;align-items:center;gap:6px}
+.gfit-dot{width:7px;height:7px;border-radius:50%;background:var(--good);animation:gdot 2s ease-in-out infinite}
+@keyframes gdot{0%,100%{opacity:1}50%{opacity:.3}}
+.gfit-sync-btn{background:none;border:none;color:var(--accent);font-size:11px;cursor:pointer;text-decoration:underline;padding:0}
+.gfit-disc-btn{background:none;border:none;color:var(--tm);font-size:11px;cursor:pointer;text-decoration:underline;padding:0}
+/* ── REMINDERS ── */
+.rem-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:11px;display:flex;align-items:center;gap:10px;transition:opacity .3s}
 .rem-card.done{opacity:.55}
-.rem-check{width:20px;height:20px;border-radius:6px;border:2px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;transition:all .2s;background:var(--s2)}
+.rem-check{width:18px;height:18px;border-radius:5px;border:2px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;background:var(--s2);transition:all .2s}
 .rem-check.checked{background:var(--good);border-color:var(--good)}
-.rem-info{flex:1}
-.rem-name{font-size:13px;font-weight:700;color:var(--tp)}
-.rem-time{font-size:11px;color:var(--ts)}
-.rem-dose{font-family:var(--mono);font-size:11px;color:var(--accent);padding:1px 7px;background:var(--aglow);border-radius:4px;flex-shrink:0}
-.rem-planned{font-size:10px;color:var(--tm);padding:2px 7px;background:var(--s3);border-radius:4px;flex-shrink:0}
-.day-reset{font-size:11px;color:var(--tm);text-align:center;margin-top:10px}
-.lcard{background:var(--s1);border-radius:var(--rs);padding:11px 13px;border:1px solid}
+.rem-info{flex:1}.rem-name{font-size:12px;font-weight:700;color:var(--tp)}.rem-time{font-size:10px;color:var(--ts)}
+.rem-dose{font-family:var(--mono);font-size:10px;color:var(--accent);padding:1px 6px;background:var(--aglow);border-radius:4px;flex-shrink:0}
+.rem-planned{font-size:9px;color:var(--tm);padding:1px 6px;background:var(--s3);border-radius:4px;flex-shrink:0}
+/* ── LIFESTYLE CARDS ── */
+.lcard{background:var(--s1);border-radius:var(--rs);padding:10px 12px;border:1px solid}
 .lcard.g{border-color:rgba(52,211,153,0.3)}.lcard.w{border-color:rgba(251,191,36,0.3)}
-.lcard-t{font-size:12px;font-weight:700}.lcard-s{font-size:11px;color:var(--tm);margin-top:2px}
-::-webkit-scrollbar{width:5px;height:5px}
+.lcard-t{font-size:11px;font-weight:700}.lcard-s{font-size:10px;color:var(--tm);margin-top:2px}
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-track{background:var(--bg)}
 ::-webkit-scrollbar-thumb{background:var(--s3);border-radius:3px}
-@media(max-width:1100px){.g4{grid-template-columns:repeat(2,1fr)}.chero{grid-template-columns:repeat(2,1fr)}.vcards{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:768px){.g4,.g3,.g2,.chero,.vcards{grid-template-columns:1fr}.hdr-name{font-size:24px}.mv{font-size:20px}}
-
-/* ── PASSWORD SCREEN ── */
-#auth-screen{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0A0E1A 0%,#0F1929 50%,#0A0E1A 100%)}
-.auth-box{background:#111827;border:1px solid #2D3748;border-radius:16px;padding:48px 40px;text-align:center;width:360px;max-width:90vw;box-shadow:0 24px 64px rgba(0,0,0,0.6)}
-.auth-logo{font-size:48px;margin-bottom:12px;animation:pulse 2s ease-in-out infinite}
-@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
-.auth-title{font-size:22px;font-weight:800;color:#E2E8F0;letter-spacing:-.02em;margin-bottom:4px}
-.auth-subtitle{font-size:12px;color:#64748B;text-transform:uppercase;letter-spacing:.12em;margin-bottom:28px}
-.auth-divider{width:40px;height:2px;background:#38BDF8;margin:0 auto 28px;border-radius:2px}
-.auth-input-wrap{position:relative;margin-bottom:14px}
-.auth-input{width:100%;padding:12px 44px 12px 16px;background:#1C2333;border:1px solid #2D3748;border-radius:10px;color:#E2E8F0;font-size:15px;font-family:inherit;outline:none;transition:border-color .2s;text-align:center;letter-spacing:.06em}
-.auth-input:focus{border-color:#38BDF8}
-.auth-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:#64748B;cursor:pointer;font-size:16px}
-.auth-btn{width:100%;padding:12px;background:linear-gradient(135deg,#0284C7,#38BDF8);border:none;border-radius:10px;color:white;font-size:14px;font-weight:700;cursor:pointer;transition:opacity .2s;margin-bottom:10px}
-.auth-btn:hover{opacity:.9}
-.auth-error{font-size:12px;color:#F87171;height:18px;transition:opacity .2s}
-.auth-note{font-size:10px;color:#475569;margin-top:20px;line-height:1.6}
-/* ── GOOGLE FIT BUTTON ── */
-.gfit-btn{display:inline-flex;align-items:center;gap:10px;padding:10px 20px;background:#FFFFFF;border:none;border-radius:8px;font-size:13px;font-weight:600;color:#3c4043;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.3);transition:box-shadow .2s}
-body.light .gfit-btn{box-shadow:0 2px 8px rgba(0,0,0,0.15)}
-.gfit-btn:hover{box-shadow:0 4px 16px rgba(0,0,0,0.4)}
-.gfit-btn svg{width:20px;height:20px}
-.gfit-status{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--s2);border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--ts)}
-.gfit-status.connected{border-color:rgba(52,211,153,0.4);background:rgba(52,211,153,0.05)}
-.gfit-dot{width:8px;height:8px;border-radius:50%;background:var(--tm)}
-.gfit-dot.live{background:var(--good);box-shadow:0 0 6px var(--good);animation:blink 2s ease-in-out infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
-.gfit-sync{font-size:11px;color:var(--accent);text-decoration:underline;cursor:pointer;background:none;border:none}
-.gfit-loading{text-align:center;padding:20px;color:var(--tm);font-size:12px}
-
+/* ── RESPONSIVE ── */
+@media(max-width:900px){.g4{grid-template-columns:repeat(2,1fr)}.chero,.vcards{grid-template-columns:1fr}}
+@media(max-width:600px){.g4,.g2,.chero,.vcards{grid-template-columns:1fr}.hdr-name{font-size:22px}}
 </style>
 </head>
 <body>
 
-<!-- PASSWORD SCREEN -->
+<!-- ═══ PASSWORD SCREEN ═══ -->
 <div id="auth-screen">
   <div class="auth-box">
     <div class="auth-logo">&#129756;</div>
     <div class="auth-title">Baden Appleyard</div>
-    <div class="auth-subtitle">Health Dashboard</div>
-    <div class="auth-divider"></div>
-    <div class="auth-input-wrap">
-      <input class="auth-input" type="password" id="pwd-input" placeholder="Enter password"
-        onkeydown="if(event.key==='Enter')checkPassword()">
-      <button class="auth-toggle" onclick="togglePwd()" title="Show/hide">&#128065;</button>
+    <div class="auth-sub">Health Dashboard</div>
+    <div class="auth-bar"></div>
+    <div class="auth-wrap">
+      <input class="auth-inp" type="password" id="pwd-inp" placeholder="Enter password"
+        onkeydown="if(event.key==='Enter')doAuth()">
+      <button class="auth-eye" onclick="toggleEye()" title="Show/hide">&#128065;</button>
     </div>
-    <button class="auth-btn" onclick="checkPassword()">&#9654; Access Dashboard</button>
-    <div class="auth-error" id="pwd-error"></div>
-    <div class="auth-note">Private health data &#8212; authorised access only.<br>Session is remembered on this device.</div>
+    <button class="auth-btn" onclick="doAuth()">&#9654;&nbsp; Access Dashboard</button>
+    <div class="auth-err" id="auth-err"></div>
+    <div class="auth-note">Private health data &mdash; authorised access only.<br>This device will remember your login.</div>
   </div>
 </div>
 
@@ -225,29 +211,29 @@ body.light .gfit-btn{box-shadow:0 2px 8px rgba(0,0,0,0.15)}
   <div class="hdr-inner">
     <div class="hdr-row">
       <div>
-        <div class="eyebrow">Personal Health Dashboard &middot; Confidential &middot; Updated June 2026</div>
+        <div class="eyebrow">Personal Health Dashboard &middot; Confidential &middot; June 2026</div>
         <div class="hdr-name">Baden Appleyard</div>
-        <div class="hdr-sub">Male &middot; Age 55 &middot; DOB 03 Mar 1971 &middot; 185 cm &middot; 92 kg &middot; Carindale QLD &middot; Non-smoker &middot; Non-drinker</div>
+        <div class="hdr-sub">Male &middot; Age 55 &middot; 185 cm &middot; 92 kg &middot; Carindale QLD &middot; Non-smoker &middot; Non-drinker</div>
       </div>
       <div class="hdr-right">
         <button class="theme-btn" onclick="toggleTheme()" id="theme-btn">&#9790; Light Mode</button>
         <div class="hdr-vitals">
-          <div class="vchip"><div class="lbl">LDL Cholesterol</div><div class="val" style="color:var(--good)">2.01 <span style="font-size:11px;color:var(--ts)">mmol/L</span></div></div>
-          <div class="vchip"><div class="lbl">Fasting Glucose</div><div class="val" style="color:var(--warn)">5.8 <span style="font-size:11px;color:var(--ts)">mmol/L</span></div></div>
-          <div class="vchip"><div class="lbl">eGFR</div><div class="val" style="color:var(--good)">88 <span style="font-size:11px;color:var(--ts)">mL/min</span></div></div>
-          <div class="vchip"><div class="lbl">CRP</div><div class="val" style="color:var(--good)">3 <span style="font-size:11px;color:var(--ts)">mg/L</span></div></div>
-          <div class="vchip"><div class="lbl">Last Bloods</div><div class="val" style="font-size:13px">11 Jun 2026</div></div>
+          <div class="vchip"><div class="lbl">LDL</div><div class="val" style="color:var(--good)">2.01 <span style="font-size:10px;color:var(--ts)">mmol/L</span></div></div>
+          <div class="vchip"><div class="lbl">Glucose</div><div class="val" style="color:var(--warn)">5.8 <span style="font-size:10px;color:var(--ts)">mmol/L</span></div></div>
+          <div class="vchip"><div class="lbl">eGFR</div><div class="val" style="color:var(--good)">88 <span style="font-size:10px;color:var(--ts)">mL/min</span></div></div>
+          <div class="vchip"><div class="lbl">CRP</div><div class="val" style="color:var(--good)">3 <span style="font-size:10px;color:var(--ts)">mg/L</span></div></div>
         </div>
       </div>
     </div>
     <div class="ecg-wrap">
-      <svg class="ecg-svg" viewBox="0 0 1400 64" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-        <line stroke="var(--border)" stroke-width=".5" opacity=".5" x1="0" y1="32" x2="1400" y2="32"/>
-        <path class="ep" d="M0,32 L42,32 L52,27 L62,32 L72,32 L79,24 L84,36 L88,3 L93,60 L98,32 L108,32 L114,29 L120,32 L190,32 L232,32 L242,27 L252,32 L262,32 L269,24 L274,36 L278,3 L283,60 L288,32 L298,32 L304,29 L310,32 L380,32 L422,32 L432,27 L442,32 L452,32 L459,24 L464,36 L468,3 L473,60 L478,32 L488,32 L494,29 L500,32 L570,32 L612,32 L622,27 L632,32 L642,32 L649,24 L654,36 L658,3 L663,60 L668,32 L678,32 L684,29 L690,32 L760,32 L802,32 L812,27 L822,32 L832,32 L839,24 L844,36 L848,3 L853,60 L858,32 L868,32 L874,29 L880,32 L950,32 L992,32 L1002,27 L1012,32 L1022,32 L1029,24 L1034,36 L1038,3 L1043,60 L1048,32 L1058,32 L1064,29 L1070,32 L1140,32 L1182,32 L1192,27 L1202,32 L1212,32 L1219,24 L1224,36 L1228,3 L1233,60 L1238,32 L1248,32 L1254,29 L1260,32 L1330,32 L1400,32"/>
+      <svg class="ecg-svg" viewBox="0 0 1400 54" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <line stroke="var(--border)" stroke-width=".5" opacity=".5" x1="0" y1="27" x2="1400" y2="27"/>
+        <path class="ep" d="M0,27 L40,27 L50,22 L60,27 L70,27 L77,19 L82,31 L86,2 L91,52 L96,27 L106,27 L112,24 L118,27 L185,27 L225,27 L235,22 L245,27 L255,27 L262,19 L267,31 L271,2 L276,52 L281,27 L291,27 L297,24 L303,27 L370,27 L410,27 L420,22 L430,27 L440,27 L447,19 L452,31 L456,2 L461,52 L466,27 L476,27 L482,24 L488,27 L555,27 L595,27 L605,22 L615,27 L625,27 L632,19 L637,31 L641,2 L646,52 L651,27 L661,27 L667,24 L673,27 L740,27 L780,27 L790,22 L800,27 L810,27 L817,19 L822,31 L826,2 L831,52 L836,27 L846,27 L852,24 L858,27 L925,27 L965,27 L975,22 L985,27 L995,27 L1002,19 L1007,31 L1011,2 L1016,52 L1021,27 L1031,27 L1037,24 L1043,27 L1110,27 L1150,27 L1160,22 L1170,27 L1180,27 L1187,19 L1192,31 L1196,2 L1201,52 L1206,27 L1216,27 L1222,24 L1228,27 L1295,27 L1335,27 L1345,22 L1355,27 L1365,27 L1372,19 L1377,31 L1381,2 L1386,52 L1391,27 L1400,27"/>
       </svg>
     </div>
   </div>
 </header>
+
 <nav class="nav">
   <div class="nav-i">
     <button class="ntab active" onclick="showTab('overview',this)">&#8853; Overview</button>
@@ -260,19 +246,20 @@ body.light .gfit-btn{box-shadow:0 2px 8px rgba(0,0,0,0.15)}
     <button class="ntab" onclick="showTab('team',this)">&#128101; Team &amp; Actions</button>
   </div>
 </nav>
+
 <main class="main">
 
 <!-- OVERVIEW -->
 <div id="tp-overview" class="tp-p active">
   <div class="alert-bar">
     <div class="abt">&#9888; Action Items</div>
-    <div class="ai"><div class="adot r"></div>Surveillance colonoscopy &#8212; book now for ~Mar 2027</div>
-    <div class="ai"><div class="adot r"></div>HbA1c repeat overdue &#8212; glucose creeping 5.4&#8594;5.8</div>
-    <div class="ai"><div class="adot w"></div>Cystatin-C eGFR baseline before starting creatine</div>
-    <div class="ai"><div class="adot w"></div>PSA + Free/Total ratio due &#8212; discuss with GP</div>
-    <div class="ai"><div class="adot g"></div>Annual skin check &#8212; solar keratosis history</div>
+    <div class="ai"><div class="adot r"></div>Colonoscopy ~Mar 2027 &mdash; book now</div>
+    <div class="ai"><div class="adot r"></div>HbA1c repeat overdue &mdash; glucose creeping</div>
+    <div class="ai"><div class="adot w"></div>Cystatin-C eGFR baseline before creatine</div>
+    <div class="ai"><div class="adot w"></div>PSA + Free/Total ratio due</div>
+    <div class="ai"><div class="adot g"></div>Annual skin check &mdash; solar keratosis history</div>
   </div>
-  <div class="st">&#9672; Current Key Metrics <span style="font-size:11px;color:var(--tm);font-weight:400;margin-left:4px">&#8212; June 2026</span></div>
+  <div class="st">&#9672; Current Key Metrics &mdash; June 2026</div>
   <div class="g4">
     <div class="mc good"><div class="ml">LDL Cholesterol</div><div class="mv">2.01<span class="mu"> mmol/L</span></div><div class="mt">Target &lt;2.5 &#10003;</div><div class="mbadge good">&#9660; 56% from baseline</div></div>
     <div class="mc good"><div class="ml">HDL Cholesterol</div><div class="mv">1.33<span class="mu"> mmol/L</span></div><div class="mt">Target &gt;1.0 &#10003;</div><div class="mbadge good">&#8593; Improving</div></div>
@@ -280,145 +267,122 @@ body.light .gfit-btn{box-shadow:0 2px 8px rgba(0,0,0,0.15)}
     <div class="mc good"><div class="ml">Total Cholesterol</div><div class="mv">3.7<span class="mu"> mmol/L</span></div><div class="mt">Target &lt;4.0 &#10003;</div><div class="mbadge good">On target</div></div>
     <div class="mc warn"><div class="ml">Fasting Glucose</div><div class="mv">5.8<span class="mu"> mmol/L</span></div><div class="mt">Pre-DM threshold 6.1</div><div class="mbadge warn">&#8593; Watch trend</div></div>
     <div class="mc warn"><div class="ml">CK (Creatine Kinase)</div><div class="mv">330<span class="mu"> U/L</span></div><div class="mt">Ref &lt;190 &middot; Action &gt;950</div><div class="mbadge warn">Exercise-related</div></div>
-    <div class="mc warn"><div class="ml">AST</div><div class="mv">39<span class="mu"> U/L</span></div><div class="mt">Ref &lt;36 &middot; Action &gt;108</div><div class="mbadge warn">Marginal &#8212; muscle</div></div>
+    <div class="mc warn"><div class="ml">AST</div><div class="mv">39<span class="mu"> U/L</span></div><div class="mt">Ref &lt;36 &middot; Action &gt;108</div><div class="mbadge warn">Marginal &mdash; muscle</div></div>
     <div class="mc good"><div class="ml">eGFR (Kidney)</div><div class="mv">88<span class="mu"> mL/min</span></div><div class="mt">Normal &gt;60</div><div class="mbadge good">Normal</div></div>
     <div class="mc good"><div class="ml">Lp(a)</div><div class="mv">33<span class="mu"> nmol/L</span></div><div class="mt">Low risk &lt;100 &#10003;</div><div class="mbadge good">Below 80th percentile</div></div>
     <div class="mc good"><div class="ml">CRP (Apr 2026)</div><div class="mv">3<span class="mu"> mg/L</span></div><div class="mt">Normal &lt;4 &#10003;</div><div class="mbadge good">Low inflammation</div></div>
-    <div class="mc info"><div class="ml">TSH (Thyroid)</div><div class="mv">0.69<span class="mu"> mIU/L</span></div><div class="mt">Ref 0.50&#8211;4.00 &#10003;</div><div class="mbadge info">Euthyroid</div></div>
-    <div class="mc warn"><div class="ml">PSA (Prostate)</div><div class="mv">1.70<span class="mu"> &#181;g/L</span></div><div class="mt">Ref &lt;3.0 &middot; F/T 20%</div><div class="mbadge warn">F/T below 24% threshold</div></div>
+    <div class="mc info"><div class="ml">TSH (Thyroid)</div><div class="mv">0.69<span class="mu"> mIU/L</span></div><div class="mt">Ref 0.50&ndash;4.00 &#10003;</div><div class="mbadge info">Euthyroid</div></div>
+    <div class="mc warn"><div class="ml">PSA (Prostate)</div><div class="mv">1.70<span class="mu"> &#181;g/L</span></div><div class="mt">Ref &lt;3.0 &middot; F/T 20%</div><div class="mbadge warn">F/T below 24%</div></div>
   </div>
   <div class="g2">
-    <div class="cc"><div class="ch"><div><div class="ct">Lipid Trend 2022&#8211;2026</div><div class="cs">Treatment Nov 2025 &#8212; exceptional LDL response</div></div><div class="cls"><div class="cli"><div class="cld" style="background:#F87171"></div>LDL</div><div class="cli"><div class="cld" style="background:#34D399"></div>HDL</div><div class="cli"><div class="cld" style="background:#38BDF8"></div>Total</div></div></div><div class="cw"><canvas id="c-lipid-ov"></canvas></div></div>
-    <div class="cc"><div class="ch"><div><div class="ct">Fasting Glucose 2022&#8211;2026</div><div class="cs">Oscillating upper-normal since 2022 &middot; HbA1c 5.5% Sep 2025</div></div><div class="cls"><div class="cli"><div class="cld" style="background:#FBBF24"></div>Glucose</div><div class="cli"><div class="cld" style="width:16px;height:1px;border-radius:0;background:rgba(248,113,113,0.6)"></div>Pre-DM 6.1</div></div></div><div class="cw"><canvas id="c-gluc-ov"></canvas></div></div>
+    <div class="cc"><div class="ch"><div><div class="ct">Lipid Trend 2022&ndash;2026</div><div class="cs">Treatment Nov 2025 &mdash; exceptional LDL response</div></div><div class="cls"><div class="cli"><div class="cld" style="background:#F87171"></div>LDL</div><div class="cli"><div class="cld" style="background:#34D399"></div>HDL</div><div class="cli"><div class="cld" style="background:#38BDF8"></div>Total</div></div></div><div class="cw"><canvas id="c-lipid-ov"></canvas></div></div>
+    <div class="cc"><div class="ch"><div><div class="ct">Fasting Glucose 2022&ndash;2026</div><div class="cs">Oscillating upper-normal &middot; HbA1c 5.5% Sep 2025</div></div></div><div class="cw"><canvas id="c-gluc-ov"></canvas></div></div>
   </div>
 </div>
 
 <!-- CARDIAC -->
 <div id="tp-cardiac" class="tp-p">
-  <div class="wbox"><div class="wbox-t">&#9888; Myocardial Bridge (LAD) &#8212; Permanent Clinical Caution</div><p>Long-segment intra-myocardial course of the LAD confirmed on CTCA. <strong>Nitrates and vasodilators are absolutely contraindicated</strong> &#8212; they paradoxically worsen systolic compression. <strong>Sudden high-intensity exertion remains deferred</strong> pending explicit cardiologist clearance. Avoid high-stimulant pre-workouts. First-line if pharmacological management needed: beta-blockers or non-DHP calcium channel blockers (diltiazem/verapamil).</p></div>
-  <div class="st">&#128756; CT Coronary Angiogram &#8212; 5 November 2025</div>
+  <div class="wbox"><div class="wbox-t">&#9888; Myocardial Bridge (LAD) &mdash; Permanent Caution</div><p><strong>Nitrates and vasodilators are absolutely contraindicated.</strong> High-intensity exertion deferred pending cardiologist clearance. Avoid stimulant pre-workouts. First-line if needed: beta-blockers or non-DHP CCBs.</p></div>
+  <div class="st">&#128756; CT Coronary Angiogram &mdash; 5 November 2025</div>
   <div class="chero">
-    <div><div class="cfl">Facility &amp; Reporting</div><div class="cfv">Queensland X-Ray, Greenslopes</div><div class="cfsub">Dr Justin Morze (Cardiologist)<br>Dr John Fenwick (Radiologist)<br>Referred by Dr Jeremy Wright<br>Indication: Atypical chest pain</div></div>
-    <div><div class="cfl">CAC Score</div><div style="font-family:var(--mono);font-size:44px;font-weight:800;color:var(--warn);line-height:1">0.6</div><div class="cfsub">Below 50th percentile for age/sex<br>Low calcified plaque burden<br>DLP 178.9 mGycm</div></div>
-    <div><div class="cfl">Classification</div><div class="cfv" style="color:var(--warn);font-weight:700;font-size:15px">Early-Stage CAD</div><div class="cfsub">Noncalcified plaque dominant<br>Myocardial bridge LAD<br>Active management commenced<br>3-month cardiologist review cycle</div></div>
+    <div><div class="cfl">Facility</div><div class="cfv">Queensland X-Ray, Greenslopes</div><div class="cfsub">Dr Justin Morze (Cardiologist)<br>Dr John Fenwick (Radiologist)<br>Referred by Dr Jeremy Wright</div></div>
+    <div><div class="cfl">CAC Score</div><div style="font-family:var(--mono);font-size:38px;font-weight:800;color:var(--warn);line-height:1">0.6</div><div class="cfsub">Below 50th percentile for age/sex</div></div>
+    <div><div class="cfl">Classification</div><div class="cfv" style="color:var(--warn);font-weight:700;font-size:13px">Early-Stage CAD</div><div class="cfsub">Noncalcified plaque dominant<br>Myocardial bridge LAD<br>3-month cardiologist cycle</div></div>
   </div>
   <div class="vcards">
-    <div class="vc danger"><div class="vct">&#128308; LAD &#8212; Left Anterior Descending</div><div style="font-size:10px;font-weight:700;color:var(--bad);margin-bottom:7px">PRIMARY VESSEL &middot; TWO STENOSES</div><div class="vcb"><div>&bull; Noncalcified plaque <strong>proximal LAD</strong> &#8594; <strong>25&#8211;50% stenosis</strong></div><div>&bull; Noncalcified plaque <strong>mid LAD</strong> &#8594; <strong>25&#8211;50% stenosis</strong></div><div>&bull; Long-segment <strong>intra-myocardial bridge</strong></div><div>&bull; Wraps around left ventricular apex</div><div>&bull; Supplies: large 1st diagonal + small 2nd diagonal</div></div></div>
-    <div class="vc caution"><div class="vct">&#128993; RCA &#8212; Right Coronary Artery</div><div style="font-size:10px;font-weight:700;color:var(--warn);margin-bottom:7px">NONOBSTRUCTIVE PLAQUE</div><div class="vcb"><div>&bull; <strong>Nonobstructive</strong> noncalcified plaque mid RCA</div><div>&bull; Large calibre dominant vessel</div><div>&bull; Supplies: large PDA + PLV branch</div><div>&bull; No significant stenosis</div></div></div>
-    <div class="vc clear"><div class="vct">&#128994; LMCA &amp; LCx</div><div style="font-size:10px;font-weight:700;color:var(--good);margin-bottom:7px">NO SIGNIFICANT PLAQUE</div><div class="vcb"><div>&bull; <strong>LMCA</strong>: Large calibre &#8212; clear</div><div>&bull; <strong>LCx</strong>: Medium calibre &#8212; clear</div><div>&bull; Cardiac chambers: <strong>normal size</strong></div><div>&bull; No mural thrombus &middot; LAA well opacified</div><div>&bull; Pericardium + great vessels unremarkable</div></div></div>
+    <div class="vc danger"><div class="vct">&#128308; LAD &mdash; Left Anterior Descending</div><div style="font-size:9px;font-weight:700;color:var(--bad);margin-bottom:5px">TWO STENOSES &middot; MYOCARDIAL BRIDGE</div><div class="vcb"><div>&bull; Noncalcified plaque <strong>proximal</strong> &#8594; <strong>25&ndash;50% stenosis</strong></div><div>&bull; Noncalcified plaque <strong>mid LAD</strong> &#8594; <strong>25&ndash;50% stenosis</strong></div><div>&bull; Long-segment <strong>intra-myocardial bridge</strong></div></div></div>
+    <div class="vc caution"><div class="vct">&#128993; RCA &mdash; Right Coronary Artery</div><div style="font-size:9px;font-weight:700;color:var(--warn);margin-bottom:5px">NONOBSTRUCTIVE PLAQUE</div><div class="vcb"><div>&bull; Nonobstructive noncalcified plaque mid RCA</div><div>&bull; Large calibre dominant vessel</div><div>&bull; No significant stenosis</div></div></div>
+    <div class="vc clear"><div class="vct">&#128994; LMCA &amp; LCx</div><div style="font-size:9px;font-weight:700;color:var(--good);margin-bottom:5px">NO SIGNIFICANT PLAQUE</div><div class="vcb"><div>&bull; LMCA: clear &middot; LCx: clear</div><div>&bull; Cardiac chambers: normal size</div><div>&bull; No mural thrombus</div></div></div>
   </div>
   <div class="g2">
-    <div class="card"><div class="ctitle">&#128138; Current Cardiac Medication</div><div style="font-family:var(--mono);font-size:22px;font-weight:800;color:var(--accent);margin-bottom:7px">Rosuvastatin 5 mg/day</div><div style="font-size:12px;color:var(--ts);line-height:1.6;margin-bottom:10px">Lowest available dose. Optimal for this supplement stack &#8212; CYP2C9/renally cleared, minimally CYP3A4-dependent. Cardiologist review Jun 2026: dose increase <strong style="color:var(--tp)">not considered necessary</strong> given LDL response.</div><div style="font-size:10px;color:var(--tm)">GP: Dr Jeremy Wright &middot; Cardiologist: Dr Justin Morze &middot; CC: Dr Phillip Wuth</div></div>
-    <div class="card"><div class="ctitle">&#128202; LDL Response to Treatment</div><div style="display:flex;align-items:center;gap:12px;margin-bottom:9px"><div style="text-align:center"><div style="font-family:var(--mono);font-size:24px;font-weight:800;color:var(--bad)">4.62</div><div style="font-size:10px;color:var(--tm)">Sep 2025 baseline</div></div><div style="font-size:22px;color:var(--good)">&#8594;</div><div style="text-align:center"><div style="font-family:var(--mono);font-size:24px;font-weight:800;color:var(--good)">2.01</div><div style="font-size:10px;color:var(--tm)">Jun 2026</div></div><div style="background:var(--gbg);border:1px solid rgba(52,211,153,0.25);border-radius:var(--rs);padding:9px 12px;text-align:center"><div style="font-family:var(--mono);font-size:20px;font-weight:800;color:var(--good)">&#8595;56%</div><div style="font-size:10px;color:var(--good)">reduction</div></div></div><div style="font-size:12px;color:var(--ts)">Synergistic: rosuvastatin 5mg + berberine 750mg + dietary improvement. Target &lt;2.5 mmol/L. <span style="color:var(--good);font-weight:700">Well within target.</span></div></div>
+    <div class="card"><div class="ctitle">&#128138; Medication</div><div style="font-family:var(--mono);font-size:20px;font-weight:800;color:var(--accent);margin-bottom:6px">Rosuvastatin 5 mg/day</div><div style="font-size:11px;color:var(--ts);line-height:1.6">Lowest available dose. Optimal for supplement stack &mdash; CYP2C9/renally cleared. Cardiologist Jun 2026: no dose increase needed.</div></div>
+    <div class="card"><div class="ctitle">&#128202; LDL Response</div><div style="display:flex;align-items:center;gap:10px;margin-bottom:7px"><div style="text-align:center"><div style="font-family:var(--mono);font-size:20px;font-weight:800;color:var(--bad)">4.62</div><div style="font-size:9px;color:var(--tm)">Sep 2025</div></div><div style="font-size:18px;color:var(--good)">&#8594;</div><div style="text-align:center"><div style="font-family:var(--mono);font-size:20px;font-weight:800;color:var(--good)">2.01</div><div style="font-size:9px;color:var(--tm)">Jun 2026</div></div><div style="background:var(--gbg);border:1px solid rgba(52,211,153,0.25);border-radius:8px;padding:8px 10px;text-align:center"><div style="font-family:var(--mono);font-size:18px;font-weight:800;color:var(--good)">&#8595;56%</div><div style="font-size:9px;color:var(--good)">reduction</div></div></div><div style="font-size:11px;color:var(--ts)">Rosuvastatin 5mg + berberine 750mg + dietary improvement. Target &lt;2.5 mmol/L achieved.</div></div>
   </div>
 </div>
 
 <!-- LAB TRENDS -->
 <div id="tp-labs" class="tp-p">
   <div class="g2">
-    <div class="cc"><div class="ch"><div><div class="ct">Lipid Panel &#8212; Full History 2022&#8211;2026</div><div class="cs">All fasting &middot; Treatment commenced Nov 2025</div></div><div class="cls"><div class="cli"><div class="cld" style="background:#F87171"></div>LDL</div><div class="cli"><div class="cld" style="background:#34D399"></div>HDL</div><div class="cli"><div class="cld" style="background:#38BDF8"></div>Total</div><div class="cli"><div class="cld" style="background:#FBBF24"></div>Non-HDL</div></div></div><div class="cw-t"><canvas id="c-lipid-full"></canvas></div></div>
-    <div class="cc"><div class="ch"><div><div class="ct">Fasting Glucose &#8212; Full History</div><div class="cs">Oscillated 5.2&#8211;6.1 since 2022 &middot; HbA1c 5.5% Sep 2025</div></div></div><div class="cw-t"><canvas id="c-gluc-full"></canvas></div></div>
+    <div class="cc"><div class="ch"><div><div class="ct">Lipid Panel &mdash; Full History 2022&ndash;2026</div><div class="cs">All fasting &middot; Treatment Nov 2025</div></div><div class="cls"><div class="cli"><div class="cld" style="background:#F87171"></div>LDL</div><div class="cli"><div class="cld" style="background:#34D399"></div>HDL</div><div class="cli"><div class="cld" style="background:#38BDF8"></div>Total</div><div class="cli"><div class="cld" style="background:#FBBF24"></div>Non-HDL</div></div></div><div class="cw-t"><canvas id="c-lipid-full"></canvas></div></div>
+    <div class="cc"><div class="ch"><div><div class="ct">Fasting Glucose &mdash; Full History</div><div class="cs">Oscillated 5.2&ndash;6.1 since 2022</div></div></div><div class="cw-t"><canvas id="c-gluc-full"></canvas></div></div>
   </div>
   <div class="g2">
     <div class="cc"><div class="ch"><div><div class="ct">Liver Enzymes</div><div class="cs">Oct 2024 spike = probable Legionella infection</div></div><div class="cls"><div class="cli"><div class="cld" style="background:#F87171"></div>GGT</div><div class="cli"><div class="cld" style="background:#FBBF24"></div>ALT</div><div class="cli"><div class="cld" style="background:#38BDF8"></div>AST</div></div></div><div class="cw-t"><canvas id="c-lft"></canvas></div></div>
-    <div class="cc"><div class="ch"><div><div class="ct">CRP &#8212; Inflammatory Marker</div><div class="cs">Oct 2024 acute illness peak &#8594; rapid recovery &#8594; low CVD baseline</div></div></div><div class="cw-t"><canvas id="c-crp"></canvas></div></div>
+    <div class="cc"><div class="ch"><div><div class="ct">CRP &mdash; Inflammatory Marker</div><div class="cs">Oct 2024 peak &#8594; rapid recovery &#8594; low CVD baseline</div></div></div><div class="cw-t"><canvas id="c-crp"></canvas></div></div>
   </div>
   <div class="g2">
-    <div class="cc"><div class="ch"><div><div class="ct">PSA Trend</div><div class="cs">Rising &middot; F/T ratio below 24% threshold &middot; Bulky prostate on CT Apr 2026</div></div></div><div class="cw-t"><canvas id="c-psa"></canvas></div></div>
-    <div class="cc"><div class="ch"><div><div class="ct">TSH &#8212; Thyroid Function</div><div class="cs">All results euthyroid 2022&#8211;2025</div></div></div><div class="cw-t"><canvas id="c-tsh"></canvas></div></div>
-  </div>
-  <div class="card" style="margin-bottom:0">
-    <div class="ctitle">&#128300; PSA Detail &#8212; Free/Total Ratio History</div>
-    <table class="rtbl">
-      <thead><tr><th>Date</th><th>Total PSA (&#181;g/L)</th><th>F/T Ratio</th><th>Reference</th><th>Status</th></tr></thead>
-      <tbody>
-        <tr><td>Jan 2023</td><td style="font-family:var(--mono)">1.50</td><td style="font-family:var(--mono)">20%</td><td style="color:var(--tm)">&gt;24%</td><td><span class="rtag m">&#9888; Below threshold</span></td></tr>
-        <tr><td>Mar 2023</td><td style="font-family:var(--mono)">1.40</td><td style="font-family:var(--mono)">22%</td><td style="color:var(--tm)">&gt;24%</td><td><span class="rtag m">&#9888; Below threshold</span></td></tr>
-        <tr><td>Oct 2023</td><td style="font-family:var(--mono)">1.40</td><td style="font-family:var(--mono)">&#8212;</td><td style="color:var(--tm)">&gt;24%</td><td><span class="rtag l">Stable</span></td></tr>
-        <tr><td>Jun 2024</td><td style="font-family:var(--mono)">1.50</td><td style="font-family:var(--mono)">20%</td><td style="color:var(--tm)">&gt;24%</td><td><span class="rtag m">&#9888; Below threshold</span></td></tr>
-        <tr><td>Sep 2025</td><td style="font-family:var(--mono)">1.70</td><td style="font-family:var(--mono)">&#8212;</td><td style="color:var(--tm)">&gt;24%</td><td><span class="rtag m">&#9888; Rising trend</span></td></tr>
-      </tbody>
-    </table>
+    <div class="cc"><div class="ch"><div><div class="ct">PSA Trend</div><div class="cs">Rising &middot; F/T ratio below 24% threshold</div></div></div><div class="cw-t"><canvas id="c-psa"></canvas></div></div>
+    <div class="cc"><div class="ch"><div><div class="ct">TSH &mdash; Thyroid Function</div><div class="cs">All results euthyroid 2022&ndash;2025</div></div></div><div class="cw-t"><canvas id="c-tsh"></canvas></div></div>
   </div>
 </div>
 
 <!-- SUPPLEMENTS -->
 <div id="tp-supplements" class="tp-p">
-  <div class="card" style="margin-bottom:18px">
+  <div class="card" style="margin-bottom:14px">
     <div class="ctitle">&#9878; Interaction Risk vs Rosuvastatin 5 mg</div>
-    <table class="rtbl">
-      <thead><tr><th>Supplement</th><th>Dose</th><th>Statin Risk</th><th>CVD Safety</th><th>Glucose Effect</th><th>Key Caveat</th></tr></thead>
-      <tbody>
-        <tr><td style="font-weight:700;color:var(--tp)">Berberine</td><td style="font-family:var(--mono)">750 mg/day</td><td><span class="rtag l">Low</span></td><td><span class="rtag vl">Beneficial</span></td><td style="color:var(--good)">&#8595; Beneficial</td><td style="color:var(--tm)">Sub-therapeutic dose; CYP3A4 risk minimal with rosuvastatin</td></tr>
-        <tr><td style="font-weight:700;color:var(--tp)">Krill Oil</td><td style="font-family:var(--mono)">2000 mg/day</td><td><span class="rtag vl">Very Low</span></td><td><span class="rtag vl">Neutral+</span></td><td style="color:var(--ts)">&#8594; Neutral</td><td style="color:var(--tm)">Astaxanthin sub-therapeutic; small AF signal at high omega-3 doses</td></tr>
-        <tr><td style="font-weight:700;color:var(--tp)">NMN</td><td style="font-family:var(--mono)">500 mg/day</td><td><span class="rtag vl">Very Low</span></td><td><span class="rtag vl">Neutral+</span></td><td style="color:var(--good)">&#8595; Slightly</td><td style="color:var(--tm)">At TGA ceiling; 12-week cycles; cancer concern theoretical only</td></tr>
-        <tr><td style="font-weight:700;color:var(--tp)">Creatine</td><td style="font-family:var(--mono)">5 g/day (planned)</td><td><span class="rtag vl">Very Low</span></td><td><span class="rtag vl">Neutral+</span></td><td style="color:var(--good)">&#8595; May improve</td><td style="color:var(--tm)">&#9888; Raises creatinine artifactually &#8212; get cystatin-C baseline first</td></tr>
-      </tbody>
-    </table>
+    <table class="rtbl"><thead><tr><th>Supplement</th><th>Dose</th><th>Statin Risk</th><th>CVD</th><th>Glucose</th><th>Key Caveat</th></tr></thead>
+    <tbody>
+      <tr><td style="font-weight:700;color:var(--tp)">Berberine</td><td style="font-family:var(--mono)">750 mg/day</td><td><span class="rtag l">Low</span></td><td><span class="rtag vl">Beneficial</span></td><td style="color:var(--good)">&#8595; Beneficial</td><td style="color:var(--tm)">Sub-therapeutic vs 900&ndash;1500mg evidence base</td></tr>
+      <tr><td style="font-weight:700;color:var(--tp)">Krill Oil</td><td style="font-family:var(--mono)">2000 mg/day</td><td><span class="rtag vl">Very Low</span></td><td><span class="rtag vl">Neutral+</span></td><td style="color:var(--ts)">Neutral</td><td style="color:var(--tm)">Astaxanthin sub-therapeutic; small AF signal at high doses</td></tr>
+      <tr><td style="font-weight:700;color:var(--tp)">NMN</td><td style="font-family:var(--mono)">500 mg/day</td><td><span class="rtag vl">Very Low</span></td><td><span class="rtag vl">Neutral+</span></td><td style="color:var(--good)">&#8595; Slightly</td><td style="color:var(--tm)">At TGA ceiling; 12-week cycles; cancer concern theoretical</td></tr>
+      <tr><td style="font-weight:700;color:var(--tp)">Creatine</td><td style="font-family:var(--mono)">5 g/day (planned)</td><td><span class="rtag vl">Very Low</span></td><td><span class="rtag vl">Neutral+</span></td><td style="color:var(--good)">&#8595; May help</td><td style="color:var(--tm)">&#9888; Raises creatinine artifactually &mdash; get cystatin-C first</td></tr>
+    </tbody></table>
   </div>
   <div class="g2">
-    <div class="sc"><div class="sh"><div><div class="sn">&#127807; Berberine</div><div class="srole">AMPK Activator &middot; Lipid + Glucose</div></div><div class="sdose">750 mg/day</div></div><div class="sdesc">AMPK activation reducing LDL synthesis and improving insulin sensitivity. Key synergistic contributor to 56% LDL reduction alongside rosuvastatin. Beneficial for glucose at 5.8 mmol/L.</div><div><div class="sri"><span style="color:var(--warn)">&#9888;</span> Sub-therapeutic &#8212; evidence base uses 900&#8211;1500 mg/day; consider titrating</div><div class="sri"><span style="color:var(--good)">&#10003;</span> Minimal CYP3A4 concern with rosuvastatin specifically</div><div class="sri"><span style="color:var(--good)">&#10003;</span> Tends to lower, not raise, liver enzymes</div></div></div>
-    <div class="sc"><div class="sh"><div><div class="sn">&#128031; Krill Oil + Astaxanthin</div><div class="srole">Omega-3 EPA/DHA &middot; Antioxidant</div></div><div class="sdose">2000 mg/day</div></div><div class="sdesc">EPA/DHA in phospholipid form (high bioavailability) + trace astaxanthin. Triglycerides already 0.8 mmol/L; anti-inflammatory role is primary rationale at this dose.</div><div><div class="sri"><span style="color:var(--bad)">&#9888;</span> Astaxanthin sub-therapeutic &#8212; &#181;g vs 4&#8211;12 mg/day needed clinically</div><div class="sri"><span style="color:var(--warn)">&#9888;</span> Small AF risk signal at sustained high omega-3 doses in CAD</div><div class="sri"><span style="color:var(--good)">&#10003;</span> No statin interaction</div></div></div>
-    <div class="sc"><div class="sh"><div><div class="sn">&#128300; NMN</div><div class="srole">NAD+ Precursor &middot; Cellular Energy</div></div><div class="sdose">500 mg/day</div></div><div class="sdesc">Raises intracellular NAD+. Promising early human data for vascular health, insulin sensitivity and arterial stiffness. TGA Listed in Australia from 10/12/2025.</div><div><div class="sri"><span style="color:var(--warn)">&#9888;</span> At exact TGA maximum &#8212; do not exceed 500 mg/day</div><div class="sri"><span style="color:var(--warn)">&#9888;</span> TGA recommends 12-week use cycles</div><div class="sri"><span style="color:var(--warn)">&#9888;</span> Theoretical cancer concern (NAMPT) &#8212; unproven in humans</div><div class="sri"><span style="color:var(--good)">&#10003;</span> No statin or cardiac interaction</div></div></div>
-    <div class="sc"><div class="sh"><div><div class="sn">&#128170; Creatine Monohydrate</div><div class="srole">Ergogenic &middot; Strength &middot; Cognitive</div></div><div class="sdose" style="color:var(--warn)">5 g/day &#8212; PLANNED</div></div><div class="sdesc">Strongest supplement evidence for resistance training in men 50+. Supports phosphocreatine-ATP system. Modest cognitive benefit. No loading phase needed.</div><div><div class="sri"><span style="color:var(--bad)">&#9888;</span> MUST get cystatin-C eGFR baseline first &#8212; raises creatinine artifactually</div><div class="sri"><span style="color:var(--good)">&#10003;</span> No CYP3A4 interaction &middot; May blunt exercise-CK (beneficial given CK 330)</div><div class="sri"><span style="color:var(--good)">&#10003;</span> No cardiovascular or myocardial bridge contraindication</div></div></div>
+    <div class="sc"><div class="sh"><div><div class="sn">&#127807; Berberine</div><div class="srole">AMPK Activator &middot; Lipid + Glucose</div></div><div class="sdose">750 mg/day</div></div><div class="sdesc">Key synergistic contributor to 56% LDL reduction alongside rosuvastatin. Beneficial for glucose at 5.8 mmol/L.</div><div><div class="sri"><span style="color:var(--warn)">&#9888;</span> Sub-therapeutic; consider titrating to 1000&ndash;1500mg with GP</div><div class="sri"><span style="color:var(--good)">&#10003;</span> Minimal CYP3A4 concern with rosuvastatin</div></div></div>
+    <div class="sc"><div class="sh"><div><div class="sn">&#128031; Krill Oil</div><div class="srole">Omega-3 EPA/DHA &middot; Antioxidant</div></div><div class="sdose">2000 mg/day</div></div><div class="sdesc">EPA/DHA in phospholipid form. Triglycerides already 0.8 mmol/L; anti-inflammatory role is primary rationale.</div><div><div class="sri"><span style="color:var(--bad)">&#9888;</span> Astaxanthin sub-therapeutic &mdash; &#181;g vs 4&ndash;12mg/day needed</div><div class="sri"><span style="color:var(--warn)">&#9888;</span> Small AF risk signal at sustained high omega-3 doses in CAD</div></div></div>
+    <div class="sc"><div class="sh"><div><div class="sn">&#128300; NMN</div><div class="srole">NAD+ Precursor &middot; Cellular Energy</div></div><div class="sdose">500 mg/day</div></div><div class="sdesc">Raises intracellular NAD+. Promising early human data for vascular health. TGA Listed from 10/12/2025.</div><div><div class="sri"><span style="color:var(--warn)">&#9888;</span> At TGA maximum &mdash; 12-week cycles recommended</div><div class="sri"><span style="color:var(--warn)">&#9888;</span> Theoretical cancer concern (NAMPT) &mdash; unproven in humans</div></div></div>
+    <div class="sc"><div class="sh"><div><div class="sn">&#128170; Creatine</div><div class="srole">Ergogenic &middot; Strength &middot; Cognitive</div></div><div class="sdose" style="color:var(--warn)">5 g/day &mdash; PLANNED</div></div><div class="sdesc">Strongest supplement evidence for resistance training in men 50+. No loading phase needed.</div><div><div class="sri"><span style="color:var(--bad)">&#9888;</span> Get cystatin-C eGFR baseline first &mdash; creatine raises creatinine</div><div class="sri"><span style="color:var(--good)">&#10003;</span> No CYP3A4 issue &middot; May blunt exercise-CK</div></div></div>
   </div>
 </div>
 
 <!-- FITNESS -->
 <div id="tp-fitness" class="tp-p">
-  <div id="gfit-connect-bar" style="background:rgba(56,189,248,0.06);border:1px solid rgba(56,189,248,0.2);border-radius:var(--r);padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+  <!-- Google Fit connection bar -->
+  <div class="gfit-bar">
     <div>
-      <div style="font-size:13px;font-weight:700;color:var(--tp);margin-bottom:3px">&#127939; Google Fit Integration</div>
-      <div id="gfit-status-text" style="font-size:11px;color:var(--ts)">Connect to pull your steps, heart rate, sleep and VO&#8322; max automatically.</div>
+      <div class="gfit-title">&#127939; Google Fit</div>
+      <div class="gfit-sub" id="gfit-sub-text">Connect to pull your steps, heart rate and sleep automatically.</div>
     </div>
-    <div id="gfit-btn-area">
-      <button class="gfit-btn" onclick="connectGoogleFit()">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z" fill="#4285F4"/></svg>
+    <div id="gfit-btn-wrap">
+      <button class="gfit-connect-btn" onclick="connectGFit()">
+        <svg viewBox="0 0 24 24" style="width:18px;height:18px" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
         Connect Google Fit
       </button>
     </div>
   </div>
-
-  <div class="g4" style="margin-bottom:18px">
-    <div class="fit-stat"><div class="fit-stat-val" id="stat-steps">&#8212;</div><div class="fit-stat-lbl">Steps Today</div><div class="fit-stat-sub">Target: 10,000</div></div>
-    <div class="fit-stat"><div class="fit-stat-val" id="stat-hr">&#8212;</div><div class="fit-stat-lbl">Resting HR</div><div class="fit-stat-sub">bpm</div></div>
-    <div class="fit-stat"><div class="fit-stat-val" id="stat-sleep">&#8212;</div><div class="fit-stat-lbl">Sleep Last Night</div><div class="fit-stat-sub">hours</div></div>
-    <div class="fit-stat"><div class="fit-stat-val" id="stat-vo2">&#8212;</div><div class="fit-stat-lbl">VO&#8322; Max</div><div class="fit-stat-sub">mL/kg/min (Google Fit)</div></div>
+  <div class="g4" style="margin-bottom:14px">
+    <div class="fit-stat"><div class="fsv" id="stat-steps">&mdash;</div><div class="fsl">Steps (latest)</div><div class="fss">Target: 10,000</div></div>
+    <div class="fit-stat"><div class="fsv" id="stat-hr">&mdash;</div><div class="fsl">Resting HR</div><div class="fss">bpm</div></div>
+    <div class="fit-stat"><div class="fsv" id="stat-sleep">&mdash;</div><div class="fsl">Sleep (latest)</div><div class="fss">hours</div></div>
+    <div class="fit-stat"><div class="fsv" id="stat-vo2">&mdash;</div><div class="fsl">VO&#8322; Max</div><div class="fss">mL/kg/min</div></div>
   </div>
   <div class="g2">
-    <div class="cc"><div class="ch"><div><div class="ct">Daily Steps</div><div class="cs">Target 10,000 steps/day</div></div></div><div class="form-section"><div class="form-section-title">+ Log Steps</div><div class="form-row"><div class="fg"><div class="flbl">Date</div><input class="finp" type="date" id="f-steps-date"></div><div class="fg"><div class="flbl">Steps</div><input class="finp" type="number" id="f-steps-val" placeholder="e.g. 8500" min="0" max="99999"></div><button class="fbtn" onclick="addFitData('steps')">Add</button></div></div><div class="cw"><canvas id="c-steps"></canvas></div></div>
-    <div class="cc"><div class="ch"><div><div class="ct">Resting Heart Rate</div><div class="cs">Healthy range for active 55yo: 55&#8211;75 bpm</div></div></div><div class="form-section"><div class="form-section-title">+ Log Resting HR</div><div class="form-row"><div class="fg"><div class="flbl">Date</div><input class="finp" type="date" id="f-hr-date"></div><div class="fg"><div class="flbl">BPM</div><input class="finp" type="number" id="f-hr-val" placeholder="e.g. 62" min="30" max="150"></div><button class="fbtn" onclick="addFitData('hr')">Add</button></div></div><div class="cw"><canvas id="c-hr"></canvas></div></div>
+    <div class="cc"><div class="ch"><div><div class="ct">Daily Steps</div><div class="cs">Target 10,000/day &middot; Auto-populated from Google Fit when connected</div></div></div><div class="form-section"><div class="fst">+ Log manually</div><div class="form-row"><div class="fg"><div class="flbl">Date</div><input class="finp" type="date" id="f-steps-date"></div><div class="fg"><div class="flbl">Steps</div><input class="finp" type="number" id="f-steps-val" placeholder="8500"></div><button class="fbtn" onclick="addFit('steps')">Add</button></div></div><div class="cw"><canvas id="c-steps"></canvas></div></div>
+    <div class="cc"><div class="ch"><div><div class="ct">Resting Heart Rate</div><div class="cs">Healthy range for active 55yo: 55&ndash;75 bpm</div></div></div><div class="form-section"><div class="fst">+ Log manually</div><div class="form-row"><div class="fg"><div class="flbl">Date</div><input class="finp" type="date" id="f-hr-date"></div><div class="fg"><div class="flbl">BPM</div><input class="finp" type="number" id="f-hr-val" placeholder="62"></div><button class="fbtn" onclick="addFit('hr')">Add</button></div></div><div class="cw"><canvas id="c-hr"></canvas></div></div>
   </div>
   <div class="g2">
-    <div class="cc"><div class="ch"><div><div class="ct">Sleep Duration</div><div class="cs">Target 7&#8211;8 hours nightly</div></div></div><div class="form-section"><div class="form-section-title">+ Log Sleep</div><div class="form-row"><div class="fg"><div class="flbl">Date</div><input class="finp" type="date" id="f-sleep-date"></div><div class="fg"><div class="flbl">Hours</div><input class="finp" type="number" id="f-sleep-val" placeholder="e.g. 7.5" step="0.5" min="0" max="14"></div><button class="fbtn" onclick="addFitData('sleep')">Add</button></div></div><div class="cw"><canvas id="c-sleep"></canvas></div></div>
-    <div class="cc"><div class="ch"><div><div class="ct">VO&#8322; Max Estimate</div><div class="cs">Google Fit estimate &middot; Average 55yo male: 30&#8211;38 mL/kg/min</div></div></div><div class="form-section"><div class="form-section-title">+ Log VO&#8322; Max</div><div class="form-row"><div class="fg"><div class="flbl">Date</div><input class="finp" type="date" id="f-vo2-date"></div><div class="fg"><div class="flbl">mL/kg/min</div><input class="finp" type="number" id="f-vo2-val" placeholder="e.g. 36" step="0.1" min="10" max="80"></div><button class="fbtn" onclick="addFitData('vo2')">Add</button></div></div><div class="cw"><canvas id="c-vo2"></canvas></div></div>
-  </div>
-  <div class="card">
-    <div class="ctitle">&#128241; Connecting Google Fit</div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;font-size:12px;color:var(--ts)">
-      <div><strong style="color:var(--accent)">Option 1 &#8212; Takeout:</strong><br>takeout.google.com &#8594; Google Fit &#8594; export JSON. Share the file and I can parse and import your historical data automatically.</div>
-      <div><strong style="color:var(--accent)">Option 2 &#8212; Manual entry:</strong><br>Use the forms above. Everything saves locally and persists across sessions when used as a PWA.</div>
-      <div><strong style="color:var(--accent)">Option 3 &#8212; PWA + API:</strong><br>When installed as a PWA, Google Fit API access can be added via OAuth2 for automatic daily sync.</div>
-    </div>
+    <div class="cc"><div class="ch"><div><div class="ct">Sleep Duration</div><div class="cs">Target 7&ndash;8 hours nightly</div></div></div><div class="form-section"><div class="fst">+ Log manually</div><div class="form-row"><div class="fg"><div class="flbl">Date</div><input class="finp" type="date" id="f-sleep-date"></div><div class="fg"><div class="flbl">Hours</div><input class="finp" type="number" id="f-sleep-val" placeholder="7.5" step="0.5"></div><button class="fbtn" onclick="addFit('sleep')">Add</button></div></div><div class="cw"><canvas id="c-sleep"></canvas></div></div>
+    <div class="cc"><div class="ch"><div><div class="ct">VO&#8322; Max Estimate</div><div class="cs">Average for active 55yo male: 30&ndash;38 mL/kg/min</div></div></div><div class="form-section"><div class="fst">+ Log manually</div><div class="form-row"><div class="fg"><div class="flbl">Date</div><input class="finp" type="date" id="f-vo2-date"></div><div class="fg"><div class="flbl">mL/kg/min</div><input class="finp" type="number" id="f-vo2-val" placeholder="36" step="0.1"></div><button class="fbtn" onclick="addFit('vo2')">Add</button></div></div><div class="cw"><canvas id="c-vo2"></canvas></div></div>
   </div>
 </div>
 
 <!-- TRACKERS -->
 <div id="tp-trackers" class="tp-p">
   <div class="st">&#10084; Blood Pressure Log</div>
-  <div class="g2" style="margin-bottom:20px">
-    <div class="cc"><div class="ch"><div><div class="ct">Blood Pressure Trend</div><div class="cs">Target: systolic &lt;130 &middot; diastolic &lt;80</div></div><div class="cls"><div class="cli"><div class="cld" style="background:#F87171"></div>Systolic</div><div class="cli"><div class="cld" style="background:#38BDF8"></div>Diastolic</div></div></div><div class="form-section"><div class="form-section-title">+ Log Reading</div><div class="form-row"><div class="fg"><div class="flbl">Date</div><input class="finp" type="date" id="f-bp-date"></div><div class="fg"><div class="flbl">Systolic</div><input class="finp" type="number" id="f-bp-sys" placeholder="e.g. 118" min="60" max="250"></div><div class="fg"><div class="flbl">Diastolic</div><input class="finp" type="number" id="f-bp-dia" placeholder="e.g. 76" min="40" max="150"></div><div class="fg"><div class="flbl">Pulse</div><input class="finp" type="number" id="f-bp-pulse" placeholder="e.g. 65" min="30" max="200" style="min-width:70px"></div><button class="fbtn" onclick="addBP()">Add</button></div></div><div class="cw-t"><canvas id="c-bp"></canvas></div></div>
-    <div class="card"><div class="ctitle">&#128203; Recent BP Readings</div><div id="bp-table-wrap"><div class="no-data"><div class="no-data-icon">&#10084;</div>No readings yet.<br>Add your first blood pressure reading.</div></div><div style="margin-top:14px;font-size:11px;color:var(--tm);line-height:1.6"><strong style="color:var(--ts)">Reference &#8212; AHA/ACC 2024:</strong><br>&#9679; <span style="color:var(--good)">Normal</span>: &lt;120/80 &nbsp;&nbsp;&#9679; <span style="color:var(--warn)">Elevated</span>: 120&#8211;129/&lt;80<br>&#9679; <span style="color:var(--warn)">Stage 1</span>: 130&#8211;139/80&#8211;89 &nbsp;&#9679; <span style="color:var(--bad)">Stage 2</span>: &#8805;140/&#8805;90</div></div>
+  <div class="g2" style="margin-bottom:14px">
+    <div class="cc"><div class="ch"><div><div class="ct">Blood Pressure Trend</div><div class="cs">Target: systolic &lt;130 &middot; diastolic &lt;80</div></div><div class="cls"><div class="cli"><div class="cld" style="background:#F87171"></div>Sys</div><div class="cli"><div class="cld" style="background:#38BDF8"></div>Dia</div></div></div><div class="form-section"><div class="fst">+ Log Reading</div><div class="form-row"><div class="fg"><div class="flbl">Date</div><input class="finp" type="date" id="f-bp-date"></div><div class="fg"><div class="flbl">Systolic</div><input class="finp" type="number" id="f-bp-sys" placeholder="118" style="min-width:70px"></div><div class="fg"><div class="flbl">Diastolic</div><input class="finp" type="number" id="f-bp-dia" placeholder="76" style="min-width:70px"></div><div class="fg"><div class="flbl">Pulse</div><input class="finp" type="number" id="f-bp-pulse" placeholder="65" style="min-width:65px"></div><button class="fbtn" onclick="addBP()">Add</button></div></div><div class="cw-t"><canvas id="c-bp"></canvas></div></div>
+    <div class="card"><div class="ctitle">&#128203; Recent Readings</div><div id="bp-table-wrap"><div class="no-data"><div class="nd-icon">&#10084;</div>No readings yet.</div></div><div style="margin-top:10px;font-size:10px;color:var(--tm);line-height:1.6"><strong style="color:var(--ts)">AHA/ACC:</strong> Normal &lt;120/80 &middot; Elevated 120&ndash;129/&lt;80 &middot; Stage 1: 130&ndash;139/80&ndash;89 &middot; Stage 2: &ge;140/&ge;90</div></div>
   </div>
   <div class="st">&#9878; Body Weight &amp; BMI</div>
-  <div class="g2" style="margin-bottom:20px">
-    <div class="cc"><div class="ch"><div><div class="ct">Weight &amp; BMI Trend</div><div class="cs">Height: 185 cm &middot; BMI auto-calculated</div></div><div class="cls"><div class="cli"><div class="cld" style="background:#38BDF8"></div>Weight (kg)</div><div class="cli"><div class="cld" style="background:#FBBF24"></div>BMI</div></div></div><div class="form-section"><div class="form-section-title">+ Log Weight</div><div class="form-row"><div class="fg"><div class="flbl">Date</div><input class="finp" type="date" id="f-wt-date"></div><div class="fg"><div class="flbl">Weight (kg)</div><input class="finp" type="number" id="f-wt-val" placeholder="e.g. 91.5" step="0.1" min="40" max="300"></div><button class="fbtn" onclick="addWeight()">Add</button></div></div><div class="cw-t"><canvas id="c-weight"></canvas></div></div>
-    <div class="card"><div class="ctitle">&#128203; Weight Log &amp; BMI</div><div id="wt-table-wrap"><div class="no-data"><div class="no-data-icon">&#9878;</div>No entries yet.<br>Current known: ~92 kg &middot; BMI 26.9</div></div><div style="margin-top:14px;font-size:11px;color:var(--tm);line-height:1.6"><strong style="color:var(--ts)">BMI Reference:</strong><br>&#9679; <span style="color:var(--good)">Normal</span>: 18.5&#8211;24.9 &nbsp;&#9679; <span style="color:var(--warn)">Overweight</span>: 25.0&#8211;29.9<br>&#9679; <span style="color:var(--bad)">Obese I</span>: 30.0&#8211;34.9 &nbsp;At 185cm: target &lt;85.6 kg for BMI &lt;25</div></div>
+  <div class="g2" style="margin-bottom:14px">
+    <div class="cc"><div class="ch"><div><div class="ct">Weight &amp; BMI Trend</div><div class="cs">Height: 185 cm &middot; BMI auto-calculated</div></div><div class="cls"><div class="cli"><div class="cld" style="background:#38BDF8"></div>Weight</div><div class="cli"><div class="cld" style="background:#FBBF24"></div>BMI</div></div></div><div class="form-section"><div class="fst">+ Log Weight</div><div class="form-row"><div class="fg"><div class="flbl">Date</div><input class="finp" type="date" id="f-wt-date"></div><div class="fg"><div class="flbl">Weight (kg)</div><input class="finp" type="number" id="f-wt-val" placeholder="91.5" step="0.1"></div><button class="fbtn" onclick="addWt()">Add</button></div></div><div class="cw-t"><canvas id="c-weight"></canvas></div></div>
+    <div class="card"><div class="ctitle">&#128203; Weight Log</div><div id="wt-table-wrap"><div class="no-data"><div class="nd-icon">&#9878;</div>No entries yet.<br>Current known: ~92 kg &middot; BMI 26.9</div></div><div style="margin-top:10px;font-size:10px;color:var(--tm);line-height:1.6">Normal BMI: 18.5&ndash;24.9 &middot; Overweight: 25&ndash;29.9<br>At 185cm: target &lt;85.6 kg for BMI &lt;25</div></div>
   </div>
-  <div class="st">&#128138; Daily Supplement &amp; Medication Reminders</div>
+  <div class="st">&#128138; Daily Reminders</div>
   <div class="g2">
-    <div><div class="card" style="margin-bottom:12px"><div class="ctitle">&#9201; Today's Checklist &#8212; <span id="rem-date"></span></div><div id="rem-list" style="display:flex;flex-direction:column;gap:8px"></div><div class="day-reset">Resets daily at midnight &middot; <button onclick="resetReminders()" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:11px;text-decoration:underline">Reset Now</button></div></div></div>
-    <div class="card"><div class="ctitle">&#128172; Reminders Guide</div><div style="font-size:12px;color:var(--ts);line-height:1.7;display:flex;flex-direction:column;gap:10px"><div><strong style="color:var(--accent)">Rosuvastatin 5mg</strong><br>Best taken at the same time daily. Evening may offer marginal benefit (cholesterol synthesis peaks at night).</div><div><strong style="color:var(--accent)">NMN 500mg</strong><br>Morning, ideally fasting or with a light breakfast. Avoid combining with heavy meals.</div><div><strong style="color:var(--accent)">Berberine 750mg</strong><br>With the largest meal of the day. Reduces post-meal glucose spike.</div><div><strong style="color:var(--accent)">Krill Oil 2000mg</strong><br>With a fat-containing meal &#8212; EPA/DHA and astaxanthin are fat-soluble.</div><div><strong style="color:var(--accent)">Creatine 5g (planned)</strong><br>Daily consistency is key. Post-workout on training days, any time on rest days.</div></div></div>
+    <div><div class="card" style="margin-bottom:10px"><div class="ctitle">&#9201; Today &mdash; <span id="rem-date"></span></div><div id="rem-list" style="display:flex;flex-direction:column;gap:7px"></div><div style="font-size:10px;color:var(--tm);text-align:center;margin-top:8px">Resets at midnight &middot; <button onclick="resetRem()" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:10px;text-decoration:underline">Reset</button></div></div></div>
+    <div class="card"><div class="ctitle">&#128172; Timing Guide</div><div style="font-size:11px;color:var(--ts);line-height:1.7;display:flex;flex-direction:column;gap:7px"><div><strong style="color:var(--accent)">Rosuvastatin</strong> &mdash; evening, consistent time</div><div><strong style="color:var(--accent)">NMN</strong> &mdash; morning, fasting or light breakfast</div><div><strong style="color:var(--accent)">Berberine</strong> &mdash; with largest meal</div><div><strong style="color:var(--accent)">Krill Oil</strong> &mdash; with fat-containing meal</div><div><strong style="color:var(--accent)">Creatine (planned)</strong> &mdash; post-workout or any time</div></div></div>
   </div>
 </div>
 
@@ -428,35 +392,35 @@ body.light .gfit-btn{box-shadow:0 2px 8px rgba(0,0,0,0.15)}
     <div>
       <div class="st">&#128221; Medical Timeline</div>
       <div class="tl">
-        <div class="tli con"><div class="tdate">Jun&#8211;Jul 2022</div><div class="ttitle">Elevated Cholesterol First Documented</div><div class="tbody">Total cholesterol 6.1, LDL 3.86, HDL 0.91 (below target &gt;1.0). Glucose 5.6. Baseline established.</div></div>
-        <div class="tli con"><div class="tdate">Jan 2023</div><div class="ttitle">Peak LDL &#8212; 4.88 mmol/L</div><div class="tbody">Near severe hypercholesterolaemia threshold (4.9). PSA monitoring commenced at 1.50. Glucose 6.1 (at pre-diabetes threshold).</div></div>
-        <div class="tli med"><div class="tdate">Apr 2023</div><div class="ttitle">Skin Biopsies &#8212; Solar Keratosis</div><div class="tbody">Moderately dysplastic solar keratosis left face (pre-malignant, removed). Benign seborrhoeic keratoses. Ongoing surveillance required.</div></div>
-        <div class="tli med"><div class="tdate">Mar 2024</div><div class="ttitle">Colonoscopy &amp; Upper Endoscopy</div><div class="tbody">Dr Aidan Woodward. Sessile serrated polyp (10mm, ascending colon) &#8212; removed, benign. H. pylori negative. Prior fundoplication satisfactory. Surveillance due ~March 2027.</div></div>
-        <div class="tli cri"><div class="tdate">Oct 2024</div><div class="ttitle">Probable Legionella Infection</div><div class="tbody">CRP 43 mg/L &#8594; 25 &#8594; 6 &#8594; &lt;5. GGT 115/ALT 85/AST 58/ALP 132. Sterile pyuria. Eye involvement (all viral swabs negative). Legionella serology borderline&#8594;positive. Mild anaemia (Hb 126). Full recovery Jan 2025.</div></div>
-        <div class="tli med"><div class="tdate">Sep 2025</div><div class="ttitle">CT Sinuses + Cardiac Workup Triggered</div><div class="tbody">CT Sinuses: acute-on-chronic sinusitis, bilateral ostiomeatal obstruction, possible silent sinus syndrome. LDL 4.62 triggers CTCA referral. HbA1c 5.5% (normal). PSA 1.70 (rising).</div></div>
-        <div class="tli cri"><div class="tdate">Nov 2025</div><div class="ttitle">CTCA &#8212; Early CAD Confirmed</div><div class="tbody">LAD: noncalcified plaque proximal and mid (25&#8211;50% stenosis &#215;2). Myocardial bridge LAD. RCA: nonobstructive plaque. CAC 0.6. Rosuvastatin 5mg commenced.</div></div>
-        <div class="tli med"><div class="tdate">Apr 2026</div><div class="ttitle">CT Abdomen &amp; Pelvis</div><div class="tbody">Bulky prostate (significant given PSA trend). Diverticulosis confirmed. No appendicitis. CRP 3 mg/L (low). UTI excluded.</div></div>
-        <div class="tli pos"><div class="tdate">Jun 2026</div><div class="ttitle">Exceptional Lipid Response</div><div class="tbody">LDL 4.62 &#8594; 2.01 (56% reduction). All lipid targets met. HDL improved to 1.33. Triglycerides 0.8. Lp(a) 33 nmol/L (low risk). Cardiologist confirms no dose increase needed.</div></div>
+        <div class="tli con"><div class="tdate">Jun&ndash;Jul 2022</div><div class="ttitle">Elevated Cholesterol First Documented</div><div class="tbody">Total chol 6.1, LDL 3.86, HDL 0.91 (below target). Glucose 5.6. No treatment.</div></div>
+        <div class="tli con"><div class="tdate">Jan 2023</div><div class="ttitle">Peak LDL &mdash; 4.88 mmol/L</div><div class="tbody">Near severe hypercholesterolaemia threshold. PSA monitoring commenced 1.50. Glucose 6.1.</div></div>
+        <div class="tli med"><div class="tdate">Apr 2023</div><div class="ttitle">Skin Biopsies &mdash; Solar Keratosis</div><div class="tbody">Moderately dysplastic solar keratosis left face removed. Annual surveillance required.</div></div>
+        <div class="tli med"><div class="tdate">Mar 2024</div><div class="ttitle">Colonoscopy &amp; Upper Endoscopy</div><div class="tbody">Sessile serrated polyp 10mm removed &mdash; benign. H. pylori negative. Fundoplication satisfactory. Surveillance due ~March 2027.</div></div>
+        <div class="tli cri"><div class="tdate">Oct 2024</div><div class="ttitle">Probable Legionella Infection</div><div class="tbody">CRP 43&#8594;25&#8594;6&#8594;&lt;5. GGT 115/ALT 85/AST 58/ALP 132. Sterile pyuria. Eye involvement. Full recovery Jan 2025.</div></div>
+        <div class="tli med"><div class="tdate">Sep 2025</div><div class="ttitle">CT Sinuses + Cardiac Workup Triggered</div><div class="tbody">Acute-on-chronic sinusitis, bilateral ostiomeatal obstruction. LDL 4.62 triggers CTCA. HbA1c 5.5%. PSA 1.70.</div></div>
+        <div class="tli cri"><div class="tdate">Nov 2025</div><div class="ttitle">CTCA &mdash; Early CAD Confirmed</div><div class="tbody">LAD noncalcified plaque &times;2 (25&ndash;50%). Myocardial bridge LAD. RCA nonobstructive. CAC 0.6. Rosuvastatin commenced.</div></div>
+        <div class="tli med"><div class="tdate">Apr 2026</div><div class="ttitle">CT Abdomen &amp; Pelvis</div><div class="tbody">Bulky prostate. Diverticulosis confirmed. No appendicitis. CRP 3 mg/L. UTI excluded.</div></div>
+        <div class="tli pos"><div class="tdate">Jun 2026</div><div class="ttitle">Exceptional Lipid Response</div><div class="tbody">LDL 4.62&#8594;2.01 (56% reduction). All targets met. HDL 1.33. Triglycerides 0.8. Lp(a) 33 (low).</div></div>
       </div>
     </div>
     <div>
       <div class="st">&#8853; Active Conditions</div>
-      <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:24px">
-        <div class="card" style="padding:13px;border-color:rgba(248,113,113,0.3)"><div style="font-size:12px;font-weight:700;color:var(--bad);margin-bottom:3px">&#129756; Coronary Artery Disease &#8212; Early Stage</div><div style="font-size:11px;color:var(--ts)">Noncalcified plaque LAD (&#215;2 stenoses) + RCA. Myocardial bridge LAD. Active management: rosuvastatin + lifestyle. 3-month cardiologist cycle.</div></div>
-        <div class="card" style="padding:13px"><div style="font-size:12px;font-weight:700;color:var(--tp);margin-bottom:3px">&#9646; GORD + Prior Fundoplication</div><div style="font-size:11px;color:var(--ts)">Nissen fundoplication satisfactory on endoscopy Mar 2024. Microscopic reflux oesophagitis at GOJ. No H. pylori. No intestinal metaplasia.</div></div>
-        <div class="card" style="padding:13px"><div style="font-size:12px;font-weight:700;color:var(--tp);margin-bottom:3px">&#9889; Colonic Diverticulosis</div><div style="font-size:11px;color:var(--ts)">Sigmoid + descending colon. No active diverticulitis. Sessile serrated polyp removed Mar 2024 &#8212; benign. Surveillance colonoscopy March 2027.</div></div>
-        <div class="card" style="padding:13px"><div style="font-size:12px;font-weight:700;color:var(--tp);margin-bottom:3px">&#128067; Chronic Sinusitis</div><div style="font-size:11px;color:var(--ts)">Bilateral ostiomeatal obstruction. Possible silent sinus syndrome. Right nasal septal deviation. CT Sep 2025. Recurrent L &gt; R.</div></div>
-        <div class="card" style="padding:13px;border-color:rgba(251,191,36,0.3)"><div style="font-size:12px;font-weight:700;color:var(--warn);margin-bottom:3px">&#128300; Prostate &#8212; Active Monitoring</div><div style="font-size:11px;color:var(--ts)">Bulky prostate CT Apr 2026. PSA rising 1.50&#8594;1.70. F/T ratio consistently &lt;24% threshold. No specialist referral yet.</div></div>
-        <div class="card" style="padding:13px;border-color:rgba(248,113,113,0.2)"><div style="font-size:12px;font-weight:700;color:var(--tp);margin-bottom:3px">&#9728; Solar Keratosis History</div><div style="font-size:11px;color:var(--ts)">Moderately dysplastic solar keratosis left face removed Apr 2023. Annual surveillance required. Significant UV exposure history.</div></div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px">
+        <div class="card" style="padding:11px;border-color:rgba(248,113,113,0.3)"><div style="font-size:11px;font-weight:700;color:var(--bad);margin-bottom:2px">&#129756; Coronary Artery Disease &mdash; Early Stage</div><div style="font-size:10px;color:var(--ts)">Noncalcified plaque LAD (&times;2) + RCA. Myocardial bridge. Rosuvastatin + lifestyle. 3-month cardiologist cycle.</div></div>
+        <div class="card" style="padding:11px"><div style="font-size:11px;font-weight:700;color:var(--tp);margin-bottom:2px">&#9646; GORD + Prior Fundoplication</div><div style="font-size:10px;color:var(--ts)">Nissen fundoplication satisfactory. Microscopic reflux oesophagitis. No H. pylori.</div></div>
+        <div class="card" style="padding:11px"><div style="font-size:11px;font-weight:700;color:var(--tp);margin-bottom:2px">&#9889; Colonic Diverticulosis</div><div style="font-size:10px;color:var(--ts)">Sigmoid + descending. Polyp removed 2024 &mdash; benign. Surveillance March 2027.</div></div>
+        <div class="card" style="padding:11px"><div style="font-size:11px;font-weight:700;color:var(--tp);margin-bottom:2px">&#128067; Chronic Sinusitis</div><div style="font-size:10px;color:var(--ts)">Bilateral ostiomeatal obstruction. Possible silent sinus syndrome. Right septal deviation.</div></div>
+        <div class="card" style="padding:11px;border-color:rgba(251,191,36,0.3)"><div style="font-size:11px;font-weight:700;color:var(--warn);margin-bottom:2px">&#128300; Prostate &mdash; Active Monitoring</div><div style="font-size:10px;color:var(--ts)">Bulky on CT Apr 2026. PSA rising 1.50&#8594;1.70. F/T ratio &lt;24% consistently. No referral yet.</div></div>
+        <div class="card" style="padding:11px"><div style="font-size:11px;font-weight:700;color:var(--tp);margin-bottom:2px">&#9728; Solar Keratosis</div><div style="font-size:10px;color:var(--ts)">Dysplastic solar keratosis left face removed Apr 2023. Annual surveillance required.</div></div>
       </div>
-      <div class="st">&#10003; Protective Lifestyle Factors</div>
-      <div class="g2" style="gap:8px;margin-bottom:0">
-        <div class="lcard g"><div class="lcard-t" style="color:var(--good)">&#10003; Non-Smoker</div><div class="lcard-s">Largest single modifiable CVD risk factor eliminated</div></div>
-        <div class="lcard g"><div class="lcard-t" style="color:var(--good)">&#10003; Non-Drinker</div><div class="lcard-s">No alcohol &#8212; eliminates AF risk + liver confounders</div></div>
-        <div class="lcard g"><div class="lcard-t" style="color:var(--good)">&#10003; Daily Resistance Training</div><div class="lcard-s">100 squats + 70 push-ups daily</div></div>
-        <div class="lcard g"><div class="lcard-t" style="color:var(--good)">&#10003; Aerobic Activity</div><div class="lcard-s">5km power walks, up to 2&#215;/week</div></div>
-        <div class="lcard g"><div class="lcard-t" style="color:var(--good)">&#10003; Mediterranean-Style Diet</div><div class="lcard-s">No soft drinks &middot; Avoids ultra-processed foods</div></div>
-        <div class="lcard w"><div class="lcard-t" style="color:var(--warn)">&#9888; High-Intensity Caveat</div><div class="lcard-s">Maximal exertion deferred &#8212; myocardial bridge</div></div>
+      <div class="st">&#10003; Protective Lifestyle</div>
+      <div class="g2" style="gap:7px;margin-bottom:0">
+        <div class="lcard g"><div class="lcard-t" style="color:var(--good)">&#10003; Non-Smoker</div><div class="lcard-s">Largest modifiable CVD risk eliminated</div></div>
+        <div class="lcard g"><div class="lcard-t" style="color:var(--good)">&#10003; Non-Drinker</div><div class="lcard-s">Eliminates AF risk + liver confounders</div></div>
+        <div class="lcard g"><div class="lcard-t" style="color:var(--good)">&#10003; Daily Resistance</div><div class="lcard-s">100 squats + 70 push-ups daily</div></div>
+        <div class="lcard g"><div class="lcard-t" style="color:var(--good)">&#10003; Aerobic Activity</div><div class="lcard-s">5km power walks up to 2&times;/week</div></div>
+        <div class="lcard g"><div class="lcard-t" style="color:var(--good)">&#10003; Mediterranean Diet</div><div class="lcard-s">No soft drinks &middot; No ultra-processed</div></div>
+        <div class="lcard w"><div class="lcard-t" style="color:var(--warn)">&#9888; High-Intensity Caveat</div><div class="lcard-s">Deferred &mdash; myocardial bridge</div></div>
       </div>
     </div>
   </div>
@@ -467,223 +431,483 @@ body.light .gfit-btn{box-shadow:0 2px 8px rgba(0,0,0,0.15)}
   <div class="g2">
     <div>
       <div class="st">&#128101; Medical Team</div>
-      <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:24px">
-        <div class="dc"><div class="dav">&#128104;&#8205;&#9877;&#65039;</div><div><div class="dn">Dr Jeremy Wright</div><div class="dr">General Practitioner &#8212; Primary Care</div><div class="do">Allied Health Services, Newdegate St, Greenslopes QLD 4120</div></div></div>
-        <div class="dc"><div class="dav">&#9877;&#65039;</div><div><div class="dn">Dr Phillip Wuth</div><div class="dr">GP / Specialist Coordinator (CC)</div><div class="do">Greenslopes &#8212; dermatology, GI, sinus, specialist referrals</div></div></div>
-        <div class="dc"><div class="dav">&#129756;</div><div><div class="dn">Dr Justin Morze</div><div class="dr">Cardiologist</div><div class="do">Queensland X-Ray, Greenslopes &#8212; CTCA + cardiac follow-up</div></div></div>
-        <div class="dc"><div class="dav">&#128247;</div><div><div class="dn">Dr John Fenwick</div><div class="dr">Diagnostic &amp; Interventional Radiologist</div><div class="do">Queensland X-Ray &#8212; CTCA reporting</div></div></div>
-        <div class="dc"><div class="dav">&#128300;</div><div><div class="dn">Dr Aidan Woodward</div><div class="dr">Gastroenterologist</div><div class="do">Queensland Gastroenterology, Greenslopes Private Hospital</div></div></div>
-        <div class="dc"><div class="dav">&#128299;</div><div><div class="dn">Dr Renu Vohra</div><div class="dr">Pathologist &#8212; QML Pathology</div><div class="do">Reporting pathologist for all current monitoring panels</div></div></div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px">
+        <div class="dc"><div class="dav">&#128104;&#8205;&#9877;&#65039;</div><div><div class="dn">Dr Jeremy Wright</div><div class="dr">General Practitioner &mdash; Primary Care</div><div class="do">Allied Health Services, Newdegate St, Greenslopes QLD 4120</div></div></div>
+        <div class="dc"><div class="dav">&#9877;&#65039;</div><div><div class="dn">Dr Phillip Wuth</div><div class="dr">GP / Specialist Coordinator (CC)</div><div class="do">Greenslopes &mdash; dermatology, GI, sinus referrals</div></div></div>
+        <div class="dc"><div class="dav">&#129756;</div><div><div class="dn">Dr Justin Morze</div><div class="dr">Cardiologist</div><div class="do">Queensland X-Ray, Greenslopes &mdash; CTCA + cardiac follow-up</div></div></div>
+        <div class="dc"><div class="dav">&#128247;</div><div><div class="dn">Dr John Fenwick</div><div class="dr">Diagnostic &amp; Interventional Radiologist</div><div class="do">Queensland X-Ray &mdash; CTCA reporting</div></div></div>
+        <div class="dc"><div class="dav">&#128300;</div><div><div class="dn">Dr Aidan Woodward</div><div class="dr">Gastroenterologist</div><div class="do">Queensland Gastroenterology, Greenslopes Private</div></div></div>
+        <div class="dc"><div class="dav">&#128299;</div><div><div class="dn">Dr Renu Vohra</div><div class="dr">Pathologist &mdash; QML Pathology</div><div class="do">Reporting pathologist for all monitoring panels</div></div></div>
       </div>
-      <div class="st">&#128241; Install as Android App (PWA)</div>
-      <div class="card" style="border-color:rgba(56,189,248,0.2)"><div style="font-size:12px;color:var(--ts);line-height:1.7;display:flex;flex-direction:column;gap:10px"><div><strong style="color:var(--accent)">Step 1 &#8212; Open in Chrome on Android:</strong><br>Tap the three-dot menu &#8594; "Add to Home screen" &#8594; "Install". Opens full-screen without browser UI.</div><div><strong style="color:var(--accent)">Step 2 &#8212; Offline access:</strong><br>Once installed, the PWA caches itself. All tracked data (BP, weight, fitness logs) is saved locally and persists between sessions.</div><div><strong style="color:var(--accent)">Step 3 &#8212; Google Fit:</strong><br>When running as a PWA, Google Fit API access can be added via OAuth2 in a future version.</div><div style="background:var(--s2);border-radius:var(--rs);padding:10px;font-size:11px;color:var(--tm)">For PWA install, serve from a web server: VS Code Live Server, <code>python3 -m http.server</code>, or host on GitHub Pages / Netlify for free.</div></div></div>
     </div>
     <div>
-      <div class="st">&#9711; Upcoming &amp; Recommended Actions</div>
-      <div class="card" style="margin-bottom:18px">
-        <div class="ui"><div class="udate">~Mar 2027</div><div class="uico">&#128300;</div><div><div class="utxt">Surveillance Colonoscopy</div><div class="usub">3-year follow-up from sessile serrated polyp removal Mar 2024</div></div><div class="upri r">Book Now</div></div>
-        <div class="ui"><div class="udate">ASAP</div><div class="uico">&#129514;</div><div><div class="utxt">HbA1c (Glycated Haemoglobin)</div><div class="usub">Glucose creeping 5.4&#8594;5.7&#8594;5.8 &#8212; HbA1c clarifies 3-month average</div></div><div class="upri r">Overdue</div></div>
-        <div class="ui"><div class="udate">Pre-creatine</div><div class="uico">&#128297;</div><div><div class="utxt">Cystatin-C eGFR Baseline</div><div class="usub">Required before starting creatine &#8212; prevents eGFR misinterpretation</div></div><div class="upri r">Pre-req</div></div>
-        <div class="ui"><div class="udate">Next GP</div><div class="uico">&#128300;</div><div><div class="utxt">PSA + Free/Total Ratio</div><div class="usub">Rising PSA + sub-threshold F/T ratio + bulky prostate on CT</div></div><div class="upri w">Discuss</div></div>
+      <div class="st">&#9711; Upcoming &amp; Actions</div>
+      <div class="card" style="margin-bottom:14px">
+        <div class="ui"><div class="udate">~Mar 2027</div><div class="uico">&#128300;</div><div><div class="utxt">Surveillance Colonoscopy</div><div class="usub">3-year follow-up from sessile serrated polyp Mar 2024</div></div><div class="upri r">Book Now</div></div>
+        <div class="ui"><div class="udate">ASAP</div><div class="uico">&#129514;</div><div><div class="utxt">HbA1c</div><div class="usub">Glucose creeping 5.4&#8594;5.7&#8594;5.8 &mdash; HbA1c clarifies 3-month average</div></div><div class="upri r">Overdue</div></div>
+        <div class="ui"><div class="udate">Pre-creatine</div><div class="uico">&#128297;</div><div><div class="utxt">Cystatin-C eGFR Baseline</div><div class="usub">Required before starting creatine</div></div><div class="upri r">Pre-req</div></div>
+        <div class="ui"><div class="udate">Next GP</div><div class="uico">&#128300;</div><div><div class="utxt">PSA + Free/Total Ratio</div><div class="usub">Rising PSA + sub-threshold F/T + bulky prostate on CT</div></div><div class="upri w">Discuss</div></div>
         <div class="ui"><div class="udate">3 months</div><div class="uico">&#128202;</div><div><div class="utxt">CK + LFTs + eGFR Recheck</div><div class="usub">Full supplement stack monitoring</div></div><div class="upri w">Schedule</div></div>
-        <div class="ui"><div class="udate">Next GP</div><div class="uico">&#128138;</div><div><div class="utxt">Berberine Dose Review</div><div class="usub">750 &#8594; 1000&#8211;1500 mg/day split dosing</div></div><div class="upri w">Discuss</div></div>
-        <div class="ui"><div class="udate">Annual</div><div class="uico">&#9728;</div><div><div class="utxt">Full Skin Check</div><div class="usub">Solar keratosis history &#8212; significant UV background</div></div><div class="upri b">Annual</div></div>
-        <div class="ui"><div class="udate">Quarterly</div><div class="uico">&#129756;</div><div><div class="utxt">Cardiologist Review</div><div class="usub">3-month cycle &#8212; Dr Justin Morze</div></div><div class="upri b">Routine</div></div>
+        <div class="ui"><div class="udate">Next GP</div><div class="uico">&#128138;</div><div><div class="utxt">Berberine Dose Review</div><div class="usub">750&#8594;1000&ndash;1500 mg/day split dosing</div></div><div class="upri w">Discuss</div></div>
+        <div class="ui"><div class="udate">Annual</div><div class="uico">&#9728;</div><div><div class="utxt">Full Skin Check</div><div class="usub">Solar keratosis history</div></div><div class="upri b">Annual</div></div>
+        <div class="ui"><div class="udate">Quarterly</div><div class="uico">&#129756;</div><div><div class="utxt">Cardiologist Review</div><div class="usub">3-month cycle &mdash; Dr Justin Morze</div></div><div class="upri b">Routine</div></div>
       </div>
       <div class="st">&#128992; Critical Safety Thresholds</div>
       <div class="card" style="border-color:rgba(248,113,113,0.25)">
-        <table class="rtbl">
-          <thead><tr><th>Marker</th><th>Current</th><th>Action Threshold</th><th>Action</th></tr></thead>
-          <tbody>
-            <tr><td>CK</td><td style="font-family:var(--mono)">330 U/L</td><td style="font-family:var(--mono);color:var(--bad)">&gt;950 (5&#215; ULN)</td><td style="color:var(--ts)">Stop statin + urgent review</td></tr>
-            <tr><td>CK + symptoms/dark urine</td><td style="color:var(--ts)">&#8212;</td><td style="font-family:var(--mono);color:var(--bad)">&gt;1900 or any</td><td style="color:var(--ts)">Urgent: rhabdomyolysis</td></tr>
-            <tr><td>AST / ALT</td><td style="font-family:var(--mono)">39 / 34</td><td style="font-family:var(--mono);color:var(--bad)">&gt;108 / &gt;123 (3&#215; ULN)</td><td style="color:var(--ts)">Pause statin, investigate</td></tr>
-            <tr><td>eGFR (cystatin-C)</td><td style="font-family:var(--mono)">88</td><td style="color:var(--bad)">Sustained fall</td><td style="color:var(--ts)">Reassess creatine, nephro ref</td></tr>
-            <tr><td>New palpitations</td><td style="color:var(--ts)">None</td><td style="color:var(--bad)">Any new irregular pulse</td><td style="color:var(--ts)">Evaluate for AF</td></tr>
-            <tr><td>Any cancer diagnosis</td><td style="color:var(--ts)">None</td><td style="color:var(--bad)">Any malignancy</td><td style="color:var(--ts)">Stop NMN, oncology advice</td></tr>
-          </tbody>
-        </table>
+        <table class="rtbl"><thead><tr><th>Marker</th><th>Current</th><th>Action Threshold</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td>CK</td><td style="font-family:var(--mono)">330 U/L</td><td style="color:var(--bad)">&gt;950 (5&times; ULN)</td><td style="color:var(--ts)">Stop statin + urgent review</td></tr>
+          <tr><td>AST / ALT</td><td style="font-family:var(--mono)">39 / 34</td><td style="color:var(--bad)">&gt;108 / &gt;123</td><td style="color:var(--ts)">Pause statin, investigate</td></tr>
+          <tr><td>eGFR (cystatin-C)</td><td style="font-family:var(--mono)">88</td><td style="color:var(--bad)">Sustained fall</td><td style="color:var(--ts)">Reassess creatine</td></tr>
+          <tr><td>New palpitations</td><td style="color:var(--ts)">None</td><td style="color:var(--bad)">Any irregular pulse</td><td style="color:var(--ts)">Evaluate for AF</td></tr>
+          <tr><td>Any cancer Dx</td><td style="color:var(--ts)">None</td><td style="color:var(--bad)">Any malignancy</td><td style="color:var(--ts)">Stop NMN, oncology advice</td></tr>
+        </tbody></table>
       </div>
     </div>
   </div>
 </div>
 
 </main>
+
 <script>
+// ══════════════════════════════════════════════
+// STORAGE — localStorage + in-memory fallback
+// ══════════════════════════════════════════════
+const store = {
+  _m:{},
+  get(k,d){ try{ const v=localStorage.getItem('hd_'+k); return v!==null?JSON.parse(v):(this._m[k]!==undefined?this._m[k]:(d!==undefined?d:null)); }catch{return this._m[k]!==undefined?this._m[k]:(d!==undefined?d:null);} },
+  set(k,v){ this._m[k]=v; try{localStorage.setItem('hd_'+k,JSON.stringify(v));}catch{} }
+};
+
+// ══════════════════════════════════════════════
+// PASSWORD AUTH
+// ══════════════════════════════════════════════
+const AUTH_HASH = '2d6e10eea1d542347b0d90d1b70057322225aba26bd8610f452b1e86f7c4aa57';
+
+async function sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+async function doAuth() {
+  const inp = document.getElementById('pwd-inp');
+  const err = document.getElementById('auth-err');
+  if (!inp.value) return;
+  const hash = await sha256(inp.value);
+  if (hash === AUTH_HASH) {
+    store.set('auth_hash', hash);
+    const screen = document.getElementById('auth-screen');
+    screen.style.transition = 'opacity .4s';
+    screen.style.opacity = '0';
+    setTimeout(() => screen.remove(), 400);
+    initApp();
+  } else {
+    err.textContent = 'Incorrect password — please try again';
+    inp.value = '';
+    inp.style.borderColor = '#F87171';
+    setTimeout(() => { err.textContent = ''; inp.style.borderColor = ''; }, 3000);
+  }
+}
+
+function toggleEye() {
+  const i = document.getElementById('pwd-inp');
+  i.type = i.type === 'password' ? 'text' : 'password';
+}
+
+function checkSavedAuth() {
+  return store.get('auth_hash', null) === AUTH_HASH;
+}
+
+// ══════════════════════════════════════════════
+// THEME
+// ══════════════════════════════════════════════
 function toggleTheme() {
-  const isLight = document.body.classList.toggle('light');
-  document.getElementById('theme-btn').innerHTML = isLight ? '&#9728; Dark Mode' : '&#9790; Light Mode';
-  store.set('theme', isLight ? 'light' : 'dark');
-  const gl = isLight ? 'rgba(203,213,225,0.7)' : 'rgba(45,55,72,0.7)';
+  const L = document.body.classList.toggle('light');
+  document.getElementById('theme-btn').innerHTML = L ? '&#9728; Dark Mode' : '&#9790; Light Mode';
+  store.set('theme', L ? 'light' : 'dark');
+  const gl = L ? 'rgba(203,213,225,0.7)' : 'rgba(45,55,72,0.7)';
   Object.values(Chart.instances).forEach(c => {
     if (c.options.scales) {
       if (c.options.scales.x) c.options.scales.x.grid.color = gl;
       if (c.options.scales.y) c.options.scales.y.grid.color = gl;
     }
-    c.options.plugins.tooltip.backgroundColor = isLight ? '#FFF' : '#1C2333';
-    c.options.plugins.tooltip.titleColor = isLight ? '#0F172A' : '#E2E8F0';
-    c.options.plugins.tooltip.bodyColor = isLight ? '#475569' : '#94A3B8';
-    c.options.plugins.tooltip.borderColor = isLight ? '#CBD5E1' : '#2D3748';
-    Chart.defaults.color = isLight ? '#475569' : '#64748B';
+    const tt = c.options.plugins.tooltip;
+    tt.backgroundColor = L?'#FFF':'#1C2333';
+    tt.titleColor = L?'#0F172A':'#E2E8F0';
+    tt.bodyColor  = L?'#475569':'#94A3B8';
+    tt.borderColor = L?'#CBD5E1':'#2D3748';
+    Chart.defaults.color = L?'#475569':'#64748B';
     c.update();
   });
 }
-const store = {
-  _m: {},
-  get(k, d) {
-    try { const v = localStorage.getItem('hd_'+k); return v !== null ? JSON.parse(v) : (this._m[k] !== undefined ? this._m[k] : (d !== undefined ? d : null)); }
-    catch { return this._m[k] !== undefined ? this._m[k] : (d !== undefined ? d : null); }
-  },
-  set(k, v) { this._m[k] = v; try { localStorage.setItem('hd_'+k, JSON.stringify(v)); } catch {} }
-};
+
+// ══════════════════════════════════════════════
+// TABS
+// ══════════════════════════════════════════════
 function showTab(id, btn) {
   document.querySelectorAll('.tp-p').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.ntab').forEach(b => b.classList.remove('active'));
   document.getElementById('tp-'+id).classList.add('active');
   btn.classList.add('active');
-  const r = { overview:()=>{ if(!window._ov){renderOv();window._ov=true;} }, labs:()=>{ if(!window._lb){renderLabs();window._lb=true;} }, fitness:()=>{ if(!window._ft){initFitness();window._ft=true;}else{updateFitCharts();} }, trackers:()=>{ if(!window._tr){initTrackers();window._tr=true;}else{renderReminders();} } };
-  if (r[id]) r[id]();
+  const lazy = {
+    overview:    () => { if (!window._ov) { renderOv(); window._ov=true; } },
+    labs:        () => { if (!window._lb) { renderLabs(); window._lb=true; } },
+    fitness:     () => { if (!window._ft) { initFitness(); window._ft=true; } },
+    trackers:    () => { if (!window._tr) { initTrackers(); window._tr=true; } else { renderRem(); } }
+  };
+  if (lazy[id]) lazy[id]();
 }
+
+// ══════════════════════════════════════════════
+// CHART HELPERS
+// ══════════════════════════════════════════════
 Chart.defaults.color = '#64748B';
 Chart.defaults.font.family = "-apple-system,'Segoe UI',Inter,sans-serif";
 Chart.defaults.font.size = 10;
-function baseCfg(yLabel, yMin, yMax) {
-  const isLight = document.body.classList.contains('light');
-  const gl = isLight ? 'rgba(203,213,225,0.7)' : 'rgba(45,55,72,0.7)';
-  const tt = { backgroundColor:isLight?'#FFF':'#1C2333', borderColor:isLight?'#CBD5E1':'#2D3748', borderWidth:1, titleColor:isLight?'#0F172A':'#E2E8F0', bodyColor:isLight?'#475569':'#94A3B8', padding:10, cornerRadius:8 };
+
+function gc(yL, yMn, yMx) {
+  const L  = document.body.classList.contains('light');
+  const gl = L ? 'rgba(203,213,225,0.7)' : 'rgba(45,55,72,0.7)';
+  const tt = { backgroundColor:L?'#FFF':'#1C2333', borderColor:L?'#CBD5E1':'#2D3748', borderWidth:1, titleColor:L?'#0F172A':'#E2E8F0', bodyColor:L?'#475569':'#94A3B8', padding:8, cornerRadius:6 };
   const sc = { x:{grid:{color:gl},ticks:{maxRotation:40}}, y:{grid:{color:gl},beginAtZero:false} };
-  if (yLabel) sc.y.title = {display:true,text:yLabel,color:'#64748B'};
-  if (yMin !== undefined) sc.y.min = yMin;
-  if (yMax !== undefined) sc.y.max = yMax;
+  if (yL)  sc.y.title = {display:true,text:yL,color:'#64748B'};
+  if (yMn !== undefined) sc.y.min = yMn;
+  if (yMx !== undefined) sc.y.max = yMx;
   return { responsive:true, maintainAspectRatio:false, interaction:{intersect:false,mode:'index'}, plugins:{legend:{display:false},tooltip:tt}, scales:sc };
 }
-function ls(data, color, tension, fill, radius) {
-  tension = tension || 0.35; fill = fill || false; radius = radius || 4;
-  return { data, borderColor:color, backgroundColor:fill?(color.replace(')',',0.1)').replace('rgb','rgba')):'transparent', tension, pointRadius:radius, pointHoverRadius:6, fill };
+
+function ls(data, color, tension, fill, r) {
+  tension = tension||0.35; fill = fill||false; r = r||3;
+  return { data, borderColor:color, backgroundColor:fill?(color.replace('))',',0.1)').replace('rgb','rgba')):'transparent', tension, pointRadius:r, pointHoverRadius:5, fill };
 }
-const lipidLabels = ['Jul 22','Jan 23','Mar 23','Jan 24','Jun 24','Sep 25','Jun 26'];
-const ldl  = [3.86,4.88,3.63,4.57,4.47,4.62,2.01];
-const hdl  = [0.91,1.13,1.02,1.18,1.06,1.19,1.33];
-const tc   = [5.5,6.6,5.2,6.3,6.3,6.4,3.7];
-const nhdl = [4.59,5.47,4.18,5.12,5.24,5.21,2.37];
-const gLabels = ['Jun 22','Jul 22','Jan 23','Mar 23','Jan 24','Jun 24','Sep 25','Apr 26','Jun 26'];
-const gData = [5.6,5.6,6.1,5.2,5.5,5.5,5.4,5.7,5.8];
+
+// ══════════════════════════════════════════════
+// OVERVIEW CHARTS
+// ══════════════════════════════════════════════
+const LL  = ['Jul 22','Jan 23','Mar 23','Jan 24','Jun 24','Sep 25','Jun 26'];
+const ldl = [3.86,4.88,3.63,4.57,4.47,4.62,2.01];
+const hdl = [0.91,1.13,1.02,1.18,1.06,1.19,1.33];
+const tc  = [5.5,6.6,5.2,6.3,6.3,6.4,3.7];
+const nh  = [4.59,5.47,4.18,5.12,5.24,5.21,2.37];
+const gL  = ['Jun 22','Jul 22','Jan 23','Mar 23','Jan 24','Jun 24','Sep 25','Apr 26','Jun 26'];
+const gD  = [5.6,5.6,6.1,5.2,5.5,5.5,5.4,5.7,5.8];
+
 function renderOv() {
-  new Chart(document.getElementById('c-lipid-ov'), {type:'line', data:{labels:lipidLabels, datasets:[ls(ldl,'#F87171'),ls(hdl,'#34D399'),ls(tc,'#38BDF8')]}, options:baseCfg('mmol/L')});
-  new Chart(document.getElementById('c-gluc-ov'), {type:'line', data:{labels:gLabels, datasets:[ls(gData,'#FBBF24',0.35,true),{data:Array(9).fill(6.1),borderColor:'rgba(248,113,113,0.45)',borderDash:[5,5],pointRadius:0,tension:0}]}, options:baseCfg('mmol/L',4.5,7.0)});
+  new Chart(document.getElementById('c-lipid-ov'), {type:'line',data:{labels:LL,datasets:[ls(ldl,'#F87171'),ls(hdl,'#34D399'),ls(tc,'#38BDF8')]},options:gc('mmol/L')});
+  new Chart(document.getElementById('c-gluc-ov'),  {type:'line',data:{labels:gL,datasets:[ls(gD,'#FBBF24',0.35,true),{data:Array(9).fill(6.1),borderColor:'rgba(248,113,113,.45)',borderDash:[5,5],pointRadius:0,tension:0}]},options:gc('mmol/L',4.5,7.0)});
 }
+
+// ══════════════════════════════════════════════
+// LAB CHARTS
+// ══════════════════════════════════════════════
 function renderLabs() {
-  new Chart(document.getElementById('c-lipid-full'), {type:'line', data:{labels:lipidLabels, datasets:[ls(ldl,'#F87171'),ls(hdl,'#34D399'),ls(tc,'#38BDF8'),ls(nhdl,'#FBBF24')]}, options:baseCfg('mmol/L')});
-  new Chart(document.getElementById('c-gluc-full'), {type:'line', data:{labels:gLabels, datasets:[ls(gData,'#FBBF24',0.35,true),{data:Array(9).fill(6.1),borderColor:'rgba(248,113,113,0.4)',borderDash:[5,5],pointRadius:0,tension:0}]}, options:baseCfg('mmol/L',4.5,7.0)});
-  new Chart(document.getElementById('c-lft'), {type:'line', data:{labels:['Jun 22','Jun 24','Oct16/24','Oct23/24','Oct31/24','Jan 25','Sep 25','Apr 26','Jun 26'], datasets:[ls([24,25,115,58,34,17,22,20,22],'#F87171'),ls([22,24,85,39,32,19,19,30,34],'#FBBF24'),ls([25,25,58,30,22,22,22,32,39],'#38BDF8')]}, options:baseCfg('U/L')});
-  new Chart(document.getElementById('c-crp'), {type:'bar', data:{labels:['Oct 16/24','Oct 23/24','Oct 31/24','Jan 25','Apr 26'], datasets:[{data:[43,25,6,4,3],backgroundColor:['rgba(248,113,113,.7)','rgba(248,113,113,.5)','rgba(251,191,36,.5)','rgba(52,211,153,.4)','rgba(52,211,153,.65)'],borderColor:['#F87171','rgba(248,113,113,.8)','#FBBF24','#34D399','#34D399'],borderWidth:1,borderRadius:5}]}, options:baseCfg('mg/L',0)});
-  new Chart(document.getElementById('c-psa'), {type:'line', data:{labels:['Jan 23','Mar 23','Oct 23','Jun 24','Sep 25'], datasets:[ls([1.5,1.4,1.4,1.5,1.7],'#38BDF8',0.35,true,5),{data:Array(5).fill(3.0),borderColor:'rgba(248,113,113,.3)',borderDash:[5,5],pointRadius:0,tension:0}]}, options:baseCfg('µg/L',0,3.5)});
-  new Chart(document.getElementById('c-tsh'), {type:'line', data:{labels:['Jul 22','Jan 23','Mar 23','Jan 24','Jun 24','Sep 25'], datasets:[ls([1.3,1.4,0.96,0.86,1.5,0.69],'#38BDF8',0.35,true),{data:Array(6).fill(0.5),borderColor:'rgba(52,211,153,.3)',borderDash:[4,4],pointRadius:0,tension:0},{data:Array(6).fill(4.0),borderColor:'rgba(248,113,113,.3)',borderDash:[4,4],pointRadius:0,tension:0}]}, options:baseCfg('mIU/L',0,5)});
+  new Chart(document.getElementById('c-lipid-full'), {type:'line',data:{labels:LL,datasets:[ls(ldl,'#F87171'),ls(hdl,'#34D399'),ls(tc,'#38BDF8'),ls(nh,'#FBBF24')]},options:gc('mmol/L')});
+  new Chart(document.getElementById('c-gluc-full'),  {type:'line',data:{labels:gL,datasets:[ls(gD,'#FBBF24',0.35,true),{data:Array(9).fill(6.1),borderColor:'rgba(248,113,113,.4)',borderDash:[5,5],pointRadius:0,tension:0}]},options:gc('mmol/L',4.5,7.0)});
+  new Chart(document.getElementById('c-lft'), {type:'line',data:{labels:['Jun 22','Jun 24','Oct16/24','Oct23/24','Oct31/24','Jan 25','Sep 25','Apr 26','Jun 26'],datasets:[ls([24,25,115,58,34,17,22,20,22],'#F87171'),ls([22,24,85,39,32,19,19,30,34],'#FBBF24'),ls([25,25,58,30,22,22,22,32,39],'#38BDF8')]},options:gc('U/L')});
+  new Chart(document.getElementById('c-crp'), {type:'bar',data:{labels:['Oct 16/24','Oct 23/24','Oct 31/24','Jan 25','Apr 26'],datasets:[{data:[43,25,6,4,3],backgroundColor:['rgba(248,113,113,.7)','rgba(248,113,113,.5)','rgba(251,191,36,.5)','rgba(52,211,153,.4)','rgba(52,211,153,.65)'],borderColor:['#F87171','rgba(248,113,113,.8)','#FBBF24','#34D399','#34D399'],borderWidth:1,borderRadius:4}]},options:gc('mg/L',0)});
+  new Chart(document.getElementById('c-psa'), {type:'line',data:{labels:['Jan 23','Mar 23','Oct 23','Jun 24','Sep 25'],datasets:[ls([1.5,1.4,1.4,1.5,1.7],'#38BDF8',0.35,true,4),{data:Array(5).fill(3.0),borderColor:'rgba(248,113,113,.3)',borderDash:[5,5],pointRadius:0,tension:0}]},options:gc('µg/L',0,3.5)});
+  new Chart(document.getElementById('c-tsh'), {type:'line',data:{labels:['Jul 22','Jan 23','Mar 23','Jan 24','Jun 24','Sep 25'],datasets:[ls([1.3,1.4,0.96,0.86,1.5,0.69],'#38BDF8',0.35,true),{data:Array(6).fill(0.5),borderColor:'rgba(52,211,153,.3)',borderDash:[4,4],pointRadius:0,tension:0},{data:Array(6).fill(4.0),borderColor:'rgba(248,113,113,.3)',borderDash:[4,4],pointRadius:0,tension:0}]},options:gc('mIU/L',0,5)});
 }
-let fitCharts = {};
-const fitKeys = ['steps','hr','sleep','vo2'];
-const fitCfg = {
-  steps:{label:'Steps',color:'#34D399',yLabel:'Steps',target:10000,targetColor:'rgba(56,189,248,0.4)',type:'bar'},
-  hr:{label:'Resting HR',color:'#F87171',yLabel:'bpm',type:'line'},
-  sleep:{label:'Hours',color:'#38BDF8',yLabel:'Hours',target:7.5,targetColor:'rgba(52,211,153,0.4)',type:'bar'},
-  vo2:{label:'VO2 Max',color:'#FBBF24',yLabel:'mL/kg/min',type:'line'}
+
+// ══════════════════════════════════════════════
+// FITNESS TRACKER
+// ══════════════════════════════════════════════
+let fC = {};
+const fKeys = ['steps','hr','sleep','vo2'];
+const fCfg  = {
+  steps: {color:'#34D399',yL:'Steps',   tgt:10000, type:'bar'},
+  hr:    {color:'#F87171',yL:'bpm',     tgt:null,  type:'line'},
+  sleep: {color:'#38BDF8',yL:'Hours',   tgt:7.5,   type:'bar'},
+  vo2:   {color:'#FBBF24',yL:'mL/kg/min',tgt:null, type:'line'}
 };
+
 function initFitness() {
-  const today = new Date().toISOString().split('T')[0];
-  fitKeys.forEach(k => { const el = document.getElementById('f-'+k+'-date'); if(el) el.value = today; });
-  fitKeys.forEach(k => {
-    const cfg = fitCfg[k]; const data = store.get('fit_'+k, []);
-    const datasets = [{label:cfg.label, data:data.map(d=>d.v), borderColor:cfg.color, backgroundColor:cfg.type==='bar'?cfg.color+'99':'transparent', tension:0.3, pointRadius:4, borderRadius:4}];
-    if (cfg.target) datasets.push({data:Array(Math.max(data.length,1)).fill(cfg.target),borderColor:cfg.targetColor,borderDash:[5,5],pointRadius:0,tension:0});
-    fitCharts[k] = new Chart(document.getElementById('c-'+k), {type:cfg.type||'line', data:{labels:data.map(d=>d.date), datasets}, options:baseCfg(cfg.yLabel)});
-    if (data.length) updateStatCard(k, data[data.length-1].v);
+  const t = new Date().toISOString().split('T')[0];
+  fKeys.forEach(k => { const el=document.getElementById('f-'+k+'-date'); if(el) el.value=t; });
+  fKeys.forEach(k => {
+    const cfg = fCfg[k];
+    const data = store.get('fit_'+k, []);
+    const ds = [{label:k, data:data.map(d=>d.v), borderColor:cfg.color, backgroundColor:cfg.type==='bar'?cfg.color+'99':'transparent', tension:0.3, pointRadius:3, borderRadius:3}];
+    if (cfg.tgt) ds.push({data:Array(Math.max(data.length,1)).fill(cfg.tgt),borderColor:'rgba(56,189,248,0.35)',borderDash:[5,5],pointRadius:0,tension:0});
+    fC[k] = new Chart(document.getElementById('c-'+k), {type:cfg.type||'line', data:{labels:data.map(d=>d.date),datasets:ds}, options:gc(cfg.yL)});
+    if (data.length) updStat(k, data[data.length-1].v);
   });
 }
-function updateStatCard(k, val) { const el=document.getElementById('stat-'+k); if(el) el.textContent = k==='steps'?Number(val).toLocaleString():val; }
-function addFitData(k) {
-  const date=document.getElementById('f-'+k+'-date').value;
-  const val=parseFloat(document.getElementById('f-'+k+'-val').value);
+
+function updStat(k, v) {
+  const el = document.getElementById('stat-'+k);
+  if (el) el.textContent = k==='steps' ? Number(v).toLocaleString() : v;
+}
+
+function addFit(k) {
+  const date = document.getElementById('f-'+k+'-date').value;
+  const val  = parseFloat(document.getElementById('f-'+k+'-val').value);
   if (!date||isNaN(val)) return;
-  const data=store.get('fit_'+k,[]); data.push({date:date.slice(5),v:val}); data.sort((a,b)=>a.date.localeCompare(b.date));
-  store.set('fit_'+k,data);
-  const ch=fitCharts[k]; ch.data.labels=data.map(d=>d.date); ch.data.datasets[0].data=data.map(d=>d.v);
-  if(ch.data.datasets[1]) ch.data.datasets[1].data=Array(data.length).fill(fitCfg[k].target);
-  ch.update(); updateStatCard(k,data[data.length-1].v); document.getElementById('f-'+k+'-val').value='';
+  const data = store.get('fit_'+k, []);
+  data.push({date:date.slice(5), v:val});
+  data.sort((a,b)=>a.date.localeCompare(b.date));
+  store.set('fit_'+k, data);
+  const ch = fC[k];
+  ch.data.labels = data.map(d=>d.date);
+  ch.data.datasets[0].data = data.map(d=>d.v);
+  if (ch.data.datasets[1]) ch.data.datasets[1].data = Array(data.length).fill(fCfg[k].tgt);
+  ch.update();
+  updStat(k, val);
+  document.getElementById('f-'+k+'-val').value = '';
 }
-function updateFitCharts() { fitKeys.forEach(k=>{if(fitCharts[k])fitCharts[k].update();}); }
-let bpChart, wtChart;
+
+// ══════════════════════════════════════════════
+// GOOGLE FIT OAUTH
+// ══════════════════════════════════════════════
+const GFIT_CLIENT_ID = '420031474495-u2php4ln3j7uu0gmp2gphmftducl64qh.apps.googleusercontent.com';
+const GFIT_REDIRECT  = 'https://badapple71-hash.github.io/health-dashboard/';
+const GFIT_SCOPES    = [
+  'https://www.googleapis.com/auth/fitness.activity.read',
+  'https://www.googleapis.com/auth/fitness.heart_rate.read',
+  'https://www.googleapis.com/auth/fitness.sleep.read'
+].join(' ');
+
+function connectGFit() {
+  const url = 'https://accounts.google.com/o/oauth2/v2/auth' +
+    '?client_id='     + encodeURIComponent(GFIT_CLIENT_ID) +
+    '&redirect_uri='  + encodeURIComponent(GFIT_REDIRECT) +
+    '&response_type=token' +
+    '&scope='         + encodeURIComponent(GFIT_SCOPES) +
+    '&prompt=consent';
+  window.location.href = url;
+}
+
+function handleOAuthReturn() {
+  const hash = window.location.hash;
+  if (hash && hash.includes('access_token=')) {
+    const p = new URLSearchParams(hash.slice(1));
+    const token = p.get('access_token');
+    if (token) {
+      store.set('gfit_token',  token);
+      store.set('gfit_expiry', Date.now() + parseInt(p.get('expires_in')||3600)*1000);
+      history.replaceState(null,'',window.location.pathname);
+      return token;
+    }
+  }
+  return null;
+}
+
+function getGFitToken() {
+  const t = store.get('gfit_token', null);
+  const e = store.get('gfit_expiry', 0);
+  return (t && Date.now() < e) ? t : null;
+}
+
+function setGFitUI(connected) {
+  const sub  = document.getElementById('gfit-sub-text');
+  const wrap = document.getElementById('gfit-btn-wrap');
+  if (!sub||!wrap) return;
+  if (connected) {
+    sub.innerHTML  = '<span class="gfit-connected"><span class="gfit-dot"></span>Connected to Google Fit</span>';
+    wrap.innerHTML = '<button class="gfit-sync-btn" onclick="syncGFit()">&#8635; Sync now</button> &nbsp; <button class="gfit-disc-btn" onclick="discGFit()">Disconnect</button>';
+  } else {
+    sub.textContent  = 'Connect to pull your steps, heart rate and sleep automatically.';
+    wrap.innerHTML   = '<button class="gfit-connect-btn" onclick="connectGFit()"><svg viewBox="0 0 24 24" style="width:18px;height:18px" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>Connect Google Fit</button>';
+  }
+}
+
+function discGFit() {
+  store.set('gfit_token', null); store.set('gfit_expiry', 0);
+  setGFitUI(false);
+}
+
+async function syncGFit() {
+  const token = getGFitToken();
+  if (!token) { setGFitUI(false); return; }
+  const now = Date.now(), d30 = now - 30*86400000;
+  try {
+    // Steps
+    const sr = await fetch('https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate',{
+      method:'POST', headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
+      body:JSON.stringify({aggregateBy:[{dataTypeName:'com.google.step_count.delta'}],bucketByTime:{durationMillis:86400000},startTimeMillis:d30,endTimeMillis:now})
+    });
+    if (sr.ok) {
+      const sd = await sr.json();
+      const steps = sd.bucket.map(b=>{
+        return {date:new Date(parseInt(b.startTimeMillis)).toLocaleDateString('en-AU',{day:'numeric',month:'short'}), v:b.dataset[0]?.point?.[0]?.value?.[0]?.intVal||0};
+      }).filter(d=>d.v>0);
+      if (steps.length) {
+        store.set('fit_steps', steps);
+        updStat('steps', steps[steps.length-1].v);
+        if (window._ft && fC.steps) { fC.steps.data.labels=steps.map(d=>d.date); fC.steps.data.datasets[0].data=steps.map(d=>d.v); if(fC.steps.data.datasets[1])fC.steps.data.datasets[1].data=Array(steps.length).fill(10000); fC.steps.update(); }
+      }
+    }
+    // Resting HR
+    const hr = await fetch('https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate',{
+      method:'POST', headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
+      body:JSON.stringify({aggregateBy:[{dataTypeName:'com.google.heart_rate.bpm',dataSourceId:'derived:com.google.heart_rate.bpm:com.google.android.gms:resting_heart_rate<-merge_heart_rate_bpm'}],bucketByTime:{durationMillis:86400000},startTimeMillis:d30,endTimeMillis:now})
+    });
+    if (hr.ok) {
+      const hd = await hr.json();
+      const hrs = hd.bucket.map(b=>{
+        return {date:new Date(parseInt(b.startTimeMillis)).toLocaleDateString('en-AU',{day:'numeric',month:'short'}), v:Math.round(b.dataset[0]?.point?.[0]?.value?.[0]?.fpVal||0)};
+      }).filter(d=>d.v>0);
+      if (hrs.length) {
+        store.set('fit_hr', hrs);
+        updStat('hr', hrs[hrs.length-1].v);
+        if (window._ft && fC.hr) { fC.hr.data.labels=hrs.map(d=>d.date); fC.hr.data.datasets[0].data=hrs.map(d=>d.v); fC.hr.update(); }
+      }
+    }
+    // Sleep sessions
+    const slr = await fetch(`https://www.googleapis.com/fitness/v1/users/me/sessions?startTime=${new Date(d30).toISOString()}&endTime=${new Date(now).toISOString()}&activityType=72`,
+      {headers:{'Authorization':'Bearer '+token}});
+    if (slr.ok) {
+      const sd2 = await slr.json();
+      const byDay={};
+      (sd2.session||[]).forEach(s=>{
+        const day=new Date(parseInt(s.startTimeMillis)).toLocaleDateString('en-AU',{day:'numeric',month:'short'});
+        byDay[day]=(byDay[day]||0)+(parseInt(s.endTimeMillis)-parseInt(s.startTimeMillis))/3600000;
+      });
+      const sleep=Object.entries(byDay).map(([date,v])=>{return{date,v:Math.round(v*10)/10};}).filter(d=>d.v>0&&d.v<14);
+      if (sleep.length) {
+        store.set('fit_sleep', sleep);
+        updStat('sleep', sleep[sleep.length-1].v+'h');
+        if (window._ft && fC.sleep) { fC.sleep.data.labels=sleep.map(d=>d.date); fC.sleep.data.datasets[0].data=sleep.map(d=>d.v); if(fC.sleep.data.datasets[1])fC.sleep.data.datasets[1].data=Array(sleep.length).fill(7.5); fC.sleep.update(); }
+      }
+    }
+  } catch(e) { console.error('Google Fit sync error:',e); }
+}
+
+// ══════════════════════════════════════════════
+// BLOOD PRESSURE TRACKER
+// ══════════════════════════════════════════════
+let bpC, wtC;
 function initTrackers() {
-  const today=new Date().toISOString().split('T')[0];
-  ['bp','wt'].forEach(k=>{const el=document.getElementById('f-'+k+'-date');if(el)el.value=today;});
-  const bpData=store.get('bp',[]);
-  bpChart=new Chart(document.getElementById('c-bp'),{type:'line',data:{labels:bpData.map(d=>d.date),datasets:[ls(bpData.map(d=>d.sys),'#F87171'),ls(bpData.map(d=>d.dia),'#38BDF8'),{data:Array(Math.max(bpData.length,2)).fill(130),borderColor:'rgba(248,113,113,0.3)',borderDash:[4,4],pointRadius:0,tension:0},{data:Array(Math.max(bpData.length,2)).fill(80),borderColor:'rgba(56,189,248,0.3)',borderDash:[4,4],pointRadius:0,tension:0}]},options:baseCfg('mmHg',50,180)});
-  renderBPTable(bpData);
-  const wtData=store.get('wt',[]);
-  wtChart=new Chart(document.getElementById('c-weight'),{type:'line',data:{labels:wtData.map(d=>d.date),datasets:[ls(wtData.map(d=>d.kg),'#38BDF8',0.35,true),{data:wtData.map(d=>d.bmi),borderColor:'#FBBF24',backgroundColor:'transparent',tension:0.35,pointRadius:3,yAxisID:'y2'}]},options:{...baseCfg('kg'),scales:{...baseCfg().scales,y2:{position:'right',grid:{display:false},title:{display:true,text:'BMI',color:'#64748B'}}}}});
-  renderWtTable(wtData);
-  renderReminders();
-  document.getElementById('rem-date').textContent=new Date().toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'long'});
+  const t = new Date().toISOString().split('T')[0];
+  ['bp','wt'].forEach(k=>{const el=document.getElementById('f-'+k+'-date');if(el)el.value=t;});
+  const bd = store.get('bp',[]);
+  bpC = new Chart(document.getElementById('c-bp'),{type:'line',data:{labels:bd.map(d=>d.date),datasets:[ls(bd.map(d=>d.sys),'#F87171'),ls(bd.map(d=>d.dia),'#38BDF8'),{data:Array(Math.max(bd.length,2)).fill(130),borderColor:'rgba(248,113,113,.3)',borderDash:[4,4],pointRadius:0,tension:0},{data:Array(Math.max(bd.length,2)).fill(80),borderColor:'rgba(56,189,248,.3)',borderDash:[4,4],pointRadius:0,tension:0}]},options:gc('mmHg',50,180)});
+  renderBPT(bd);
+  const wd = store.get('wt',[]);
+  wtC = new Chart(document.getElementById('c-weight'),{type:'line',data:{labels:wd.map(d=>d.date),datasets:[ls(wd.map(d=>d.kg),'#38BDF8',0.35,true),{data:wd.map(d=>d.bmi),borderColor:'#FBBF24',backgroundColor:'transparent',tension:0.35,pointRadius:2,yAxisID:'y2'}]},options:{...gc('kg'),scales:{...gc().scales,y2:{position:'right',grid:{display:false},title:{display:true,text:'BMI',color:'#64748B'}}}}});
+  renderWtT(wd);
+  renderRem();
+  document.getElementById('rem-date').textContent=new Date().toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'});
 }
+
 function addBP() {
   const date=document.getElementById('f-bp-date').value;
   const sys=parseInt(document.getElementById('f-bp-sys').value);
   const dia=parseInt(document.getElementById('f-bp-dia').value);
   const pulse=parseInt(document.getElementById('f-bp-pulse').value)||null;
-  if(!date||isNaN(sys)||isNaN(dia)) return;
-  const data=store.get('bp',[]); data.push({date:date.slice(5),sys,dia,pulse,ts:date}); data.sort((a,b)=>a.ts.localeCompare(b.ts));
-  store.set('bp',data); const n=Math.max(data.length,2);
-  bpChart.data.labels=data.map(d=>d.date); bpChart.data.datasets[0].data=data.map(d=>d.sys); bpChart.data.datasets[1].data=data.map(d=>d.dia);
-  bpChart.data.datasets[2].data=Array(n).fill(130); bpChart.data.datasets[3].data=Array(n).fill(80);
-  bpChart.update(); renderBPTable(data); ['f-bp-sys','f-bp-dia','f-bp-pulse'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  if (!date||isNaN(sys)||isNaN(dia)) return;
+  const data=store.get('bp',[]);
+  data.push({date:date.slice(5),sys,dia,pulse,ts:date});
+  data.sort((a,b)=>a.ts.localeCompare(b.ts));
+  store.set('bp',data);
+  const n=Math.max(data.length,2);
+  bpC.data.labels=data.map(d=>d.date);
+  bpC.data.datasets[0].data=data.map(d=>d.sys);
+  bpC.data.datasets[1].data=data.map(d=>d.dia);
+  bpC.data.datasets[2].data=Array(n).fill(130);
+  bpC.data.datasets[3].data=Array(n).fill(80);
+  bpC.update(); renderBPT(data);
+  ['f-bp-sys','f-bp-dia','f-bp-pulse'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
 }
-function renderBPTable(data) {
-  const wrap=document.getElementById('bp-table-wrap');
-  if(!data.length){wrap.innerHTML='<div class="no-data"><div class="no-data-icon">&#10084;</div>No readings yet.<br>Add your first blood pressure reading.</div>';return;}
-  const rows=data.slice(-8).reverse().map(d=>{const sc=d.sys<120?'var(--good)':d.sys<130?'var(--warn)':'var(--bad)';return`<tr><td style="font-family:var(--mono)">${d.date}</td><td style="font-family:var(--mono);color:${sc};font-weight:700">${d.sys}</td><td style="font-family:var(--mono)">${d.dia}</td><td style="font-family:var(--mono)">${d.pulse||'&#8212;'}</td></tr>`;}).join('');
-  wrap.innerHTML=`<table class="rtbl"><thead><tr><th>Date</th><th>Systolic</th><th>Diastolic</th><th>Pulse</th></tr></thead><tbody>${rows}</tbody></table>`;
+
+function renderBPT(data) {
+  const w=document.getElementById('bp-table-wrap');
+  if(!data.length){w.innerHTML='<div class="no-data"><div class="nd-icon">&#10084;</div>No readings yet.</div>';return;}
+  const rows=data.slice(-6).reverse().map(d=>{
+    const c=d.sys<120?'var(--good)':d.sys<130?'var(--warn)':'var(--bad)';
+    return `<tr><td style="font-family:var(--mono)">${d.date}</td><td style="font-family:var(--mono);color:${c};font-weight:700">${d.sys}</td><td style="font-family:var(--mono)">${d.dia}</td><td style="font-family:var(--mono)">${d.pulse||'&mdash;'}</td></tr>`;
+  }).join('');
+  w.innerHTML=`<table class="rtbl"><thead><tr><th>Date</th><th>Systolic</th><th>Diastolic</th><th>Pulse</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
-function addWeight() {
+
+function addWt() {
   const date=document.getElementById('f-wt-date').value;
   const kg=parseFloat(document.getElementById('f-wt-val').value);
   if(!date||isNaN(kg)) return;
   const bmi=Math.round((kg/3.4225)*10)/10;
-  const data=store.get('wt',[]); data.push({date:date.slice(5),kg,bmi,ts:date}); data.sort((a,b)=>a.ts.localeCompare(b.ts));
-  store.set('wt',data); wtChart.data.labels=data.map(d=>d.date); wtChart.data.datasets[0].data=data.map(d=>d.kg); wtChart.data.datasets[1].data=data.map(d=>d.bmi);
-  wtChart.update(); renderWtTable(data); document.getElementById('f-wt-val').value='';
+  const data=store.get('wt',[]);
+  data.push({date:date.slice(5),kg,bmi,ts:date});
+  data.sort((a,b)=>a.ts.localeCompare(b.ts));
+  store.set('wt',data);
+  wtC.data.labels=data.map(d=>d.date);
+  wtC.data.datasets[0].data=data.map(d=>d.kg);
+  wtC.data.datasets[1].data=data.map(d=>d.bmi);
+  wtC.update(); renderWtT(data);
+  document.getElementById('f-wt-val').value='';
 }
-function renderWtTable(data) {
-  const wrap=document.getElementById('wt-table-wrap');
-  if(!data.length){wrap.innerHTML='<div class="no-data"><div class="no-data-icon">&#9878;</div>No entries yet.<br>Current known: ~92 kg &middot; BMI 26.9</div>';return;}
-  const rows=data.slice(-8).reverse().map(d=>{const bc=d.bmi<25?'var(--good)':d.bmi<30?'var(--warn)':'var(--bad)';return`<tr><td style="font-family:var(--mono)">${d.date}</td><td style="font-family:var(--mono)">${d.kg} kg</td><td style="font-family:var(--mono);color:${bc};font-weight:700">${d.bmi}</td></tr>`;}).join('');
-  wrap.innerHTML=`<table class="rtbl"><thead><tr><th>Date</th><th>Weight</th><th>BMI</th></tr></thead><tbody>${rows}</tbody></table>`;
+
+function renderWtT(data) {
+  const w=document.getElementById('wt-table-wrap');
+  if(!data.length){w.innerHTML='<div class="no-data"><div class="nd-icon">&#9878;</div>No entries yet.<br>Current: ~92 kg &middot; BMI 26.9</div>';return;}
+  const rows=data.slice(-6).reverse().map(d=>{
+    const c=d.bmi<25?'var(--good)':d.bmi<30?'var(--warn)':'var(--bad)';
+    return `<tr><td style="font-family:var(--mono)">${d.date}</td><td style="font-family:var(--mono)">${d.kg} kg</td><td style="font-family:var(--mono);color:${c};font-weight:700">${d.bmi}</td></tr>`;
+  }).join('');
+  w.innerHTML=`<table class="rtbl"><thead><tr><th>Date</th><th>Weight</th><th>BMI</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
+
+// ══════════════════════════════════════════════
+// REMINDERS
+// ══════════════════════════════════════════════
 const remItems = [
   {id:'rosuvastatin',name:'Rosuvastatin',dose:'5 mg',time:'With evening meal',icon:'&#128138;',planned:false},
-  {id:'nmn',name:'NMN',dose:'500 mg',time:'Morning, fasting or light breakfast',icon:'&#128300;',planned:false},
-  {id:'berberine',name:'Berberine',dose:'750 mg',time:'With largest meal',icon:'&#127807;',planned:false},
-  {id:'krilloil',name:'Krill Oil',dose:'2000 mg',time:'With fat-containing meal',icon:'&#128031;',planned:false},
-  {id:'creatine',name:'Creatine Monohydrate',dose:'5 g',time:'Post-workout or any time',icon:'&#128170;',planned:true}
+  {id:'nmn',        name:'NMN',         dose:'500 mg',time:'Morning, fasting',icon:'&#128300;',planned:false},
+  {id:'berberine',  name:'Berberine',   dose:'750 mg',time:'With largest meal',icon:'&#127807;',planned:false},
+  {id:'krilloil',   name:'Krill Oil',   dose:'2000 mg',time:'With fatty meal',icon:'&#128031;',planned:false},
+  {id:'creatine',   name:'Creatine',    dose:'5 g',  time:'Post-workout',icon:'&#128170;',planned:true}
 ];
-function renderReminders() {
-  const today=new Date().toISOString().split('T')[0]; const saved=store.get('rem_'+today,{});
-  document.getElementById('rem-list').innerHTML=remItems.map(item=>{const done=!!saved[item.id];return`<div class="rem-card ${done?'done':''}" id="rem-${item.id}"><div class="rem-check ${done?'checked':''}" onclick="toggleRem('${item.id}')">${done?'&#10003;':''}</div><div class="rem-info"><div class="rem-name">${item.icon} ${item.name}</div><div class="rem-time">&#9201; ${item.time}</div></div>${item.planned?'<div class="rem-planned">Planned</div>':`<div class="rem-dose">${item.dose}</div>`}</div>`;}).join('');
+
+function renderRem() {
+  const t=new Date().toISOString().split('T')[0];
+  const saved=store.get('rem_'+t,{});
+  document.getElementById('rem-list').innerHTML=remItems.map(item=>{
+    const done=!!saved[item.id];
+    return `<div class="rem-card ${done?'done':''}">
+      <div class="rem-check ${done?'checked':''}" onclick="toggleRem('${item.id}')">${done?'&#10003;':''}</div>
+      <div class="rem-info"><div class="rem-name">${item.icon} ${item.name}</div><div class="rem-time">&#9201; ${item.time}</div></div>
+      ${item.planned?'<div class="rem-planned">Planned</div>':`<div class="rem-dose">${item.dose}</div>`}
+    </div>`;
+  }).join('');
 }
+
 function toggleRem(id) {
-  const today=new Date().toISOString().split('T')[0]; const saved=store.get('rem_'+today,{});
-  saved[id]=!saved[id]; store.set('rem_'+today,saved); renderReminders();
+  const t=new Date().toISOString().split('T')[0];
+  const saved=store.get('rem_'+t,{});
+  saved[id]=!saved[id]; store.set('rem_'+t,saved); renderRem();
 }
-function resetReminders() { const today=new Date().toISOString().split('T')[0]; store.set('rem_'+today,{}); renderReminders(); }
-(function() {
-  const manifest={name:"Baden Appleyard Health Dashboard",short_name:"HealthDash",description:"Personal health monitoring dashboard",start_url:"./",display:"standalone",background_color:"#0A0E1A",theme_color:"#0A0E1A",orientation:"any",icons:[{src:"data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="#0A0E1A"/><path d="M50 30c-8-8-20-8-20 4 0 6 4 11 20 22 16-11 20-16 20-22 0-12-12-12-20-4z" fill="#F87171"/><path d="M20 50h10l6-10 8 20 6-15 5 10h25" stroke="#38BDF8" stroke-width="3" fill="none" stroke-linecap="round"/></svg>'),sizes:"any",type:"image/svg+xml",purpose:"any maskable"}]};
-  try{const blob=new Blob([JSON.stringify(manifest)],{type:'application/manifest+json'});document.getElementById('manifest-link').href=URL.createObjectURL(blob);}catch(e){}
-})();
-if('serviceWorker' in navigator) {
-  const sw=`const C='health-dash-v1';self.addEventListener('install',e=>{self.skipWaiting();});self.addEventListener('activate',e=>{e.waitUntil(clients.claim());});self.addEventListener('fetch',e=>{if(e.request.url.includes('cdnjs')){e.respondWith(caches.open(C).then(c=>c.match(e.request).then(r=>r||fetch(e.request).then(res=>{c.put(e.request,res.clone());return res;}))));}});`;
-  try{const b=new Blob([sw],{type:'application/javascript'});navigator.serviceWorker.register(URL.createObjectURL(b)).catch(()=>{});}catch(e){}
+
+function resetRem() {
+  const t=new Date().toISOString().split('T')[0];
+  store.set('rem_'+t,{}); renderRem();
 }
-window.addEventListener('DOMContentLoaded',()=>{
-  const saved=store.get('theme','dark'); if(saved==='light') toggleTheme();
-  renderOv(); window._ov=true;
+
+// ══════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════
+function initApp() {
+  // Restore theme
+  const th = store.get('theme','dark');
+  if (th === 'light') toggleTheme();
+  // Handle Google Fit OAuth return
+  const newToken = handleOAuthReturn();
+  // Render initial tab
+  renderOv(); window._ov = true;
+  // Google Fit status
+  const token = newToken || getGFitToken();
+  setGFitUI(!!token);
+  if (token) setTimeout(syncGFit, 800);
+}
+
+// Boot
+window.addEventListener('DOMContentLoaded', () => {
+  if (checkSavedAuth()) {
+    const s = document.getElementById('auth-screen');
+    if (s) s.remove();
+    initApp();
+  }
+  // If auth screen is showing, allow Enter key
+  const inp = document.getElementById('pwd-inp');
+  if (inp) inp.focus();
 });
 </script>
 </body>
