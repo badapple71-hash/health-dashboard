@@ -8,6 +8,7 @@
 <link id="manifest-link" rel="manifest">
 <title>Baden Appleyard &mdash; Health Dashboard</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
 <style>
 :root{--bg:#0A0E1A;--s1:#111827;--s2:#1C2333;--s3:#2D3748;--border:#2D3748;--tp:#E2E8F0;--ts:#94A3B8;--tm:#64748B;--accent:#38BDF8;--aglow:rgba(56,189,248,0.12);--good:#34D399;--gbg:rgba(52,211,153,0.1);--warn:#FBBF24;--wbg:rgba(251,191,36,0.1);--bad:#F87171;--rbg:rgba(248,113,113,0.1);--r:12px;--rs:8px;--mono:'JetBrains Mono','Cascadia Code',monospace}
 body.light{--bg:#F0F4F8;--s1:#FFF;--s2:#F1F5F9;--s3:#E2E8F0;--border:#CBD5E1;--tp:#0F172A;--ts:#475569;--tm:#94A3B8;--accent:#0284C7;--aglow:rgba(2,132,199,0.08);--good:#059669;--gbg:rgba(5,150,105,0.08);--warn:#D97706;--wbg:rgba(217,119,6,0.08);--bad:#DC2626;--rbg:rgba(220,38,38,0.08)}
@@ -189,6 +190,19 @@ body{background:var(--bg);color:var(--tp);font-family:-apple-system,'Segoe UI',I
 .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
 .stat-wide{grid-column:span 2}
 
+
+/* ── DRAG-TO-REORDER ── */
+.sort-handle{display:none;align-items:center;justify-content:center;width:28px;height:28px;cursor:grab;color:var(--tm);font-size:16px;border-radius:6px;background:var(--s2);border:1px solid var(--border);flex-shrink:0;user-select:none}
+.sort-handle:hover{color:var(--accent);border-color:var(--accent)}
+.sort-handle:active{cursor:grabbing}
+body.edit-mode .sort-handle{display:flex}
+body.edit-mode .sortable-row{border:1px dashed rgba(56,189,248,0.35) !important;border-radius:var(--r);padding:6px;margin-bottom:4px}
+.sort-ghost{opacity:0.4;background:var(--aglow) !important}
+.edit-layout-btn{padding:6px 12px;background:var(--s2);border:1px solid var(--border);border-radius:var(--rs);font-size:11px;font-weight:600;color:var(--ts);cursor:pointer;transition:all .2s}
+.edit-layout-btn:hover,.edit-layout-btn.active{border-color:var(--accent);color:var(--accent)}
+.row-header{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.row-header-title{font-size:11px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:.08em;flex:1}
+
 /* ── SCROLLBAR ── */
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-track{background:var(--bg)}
@@ -203,7 +217,7 @@ body{background:var(--bg);color:var(--tp);font-family:-apple-system,'Segoe UI',I
 <!-- ═══ PASSWORD SCREEN ═══ -->
 <div id="auth-screen">
   <div class="auth-box">
-    <div class="auth-logo">&#129756;</div>
+    <div class="auth-logo">&#10084;&#65039;</div>
     <div class="auth-title">Baden Appleyard</div>
     <div class="auth-sub">Health Dashboard</div>
     <div class="auth-bar"></div>
@@ -248,7 +262,7 @@ body{background:var(--bg);color:var(--tp);font-family:-apple-system,'Segoe UI',I
 <nav class="nav">
   <div class="nav-i">
     <button class="ntab active" onclick="showTab('overview',this)">&#8853; Overview</button>
-    <button class="ntab" onclick="showTab('cardiac',this)">&#129756; Cardiac</button>
+    <button class="ntab" onclick="showTab('cardiac',this)">&#10084;&#65039; Cardiac</button>
     <button class="ntab" onclick="showTab('labs',this)">&#128202; Lab Trends</button>
     <button class="ntab" onclick="showTab('supplements',this)">&#128138; Supplements</button>
     <button class="ntab" onclick="showTab('fitness',this)">&#127939; Health &amp; Activity</button>
@@ -293,7 +307,7 @@ body{background:var(--bg);color:var(--tp);font-family:-apple-system,'Segoe UI',I
 <!-- CARDIAC -->
 <div id="tp-cardiac" class="tp-p">
   <div class="wbox"><div class="wbox-t">&#9888; Myocardial Bridge (LAD) &mdash; Permanent Caution</div><p><strong>Nitrates and vasodilators are absolutely contraindicated.</strong> High-intensity exertion deferred pending cardiologist clearance. Avoid stimulant pre-workouts. First-line if needed: beta-blockers or non-DHP CCBs.</p></div>
-  <div class="st">&#128756; CT Coronary Angiogram &mdash; 5 November 2025</div>
+  <div class="st">&#10084;&#65039; CT Coronary Angiogram &mdash; 5 November 2025</div>
   <div class="chero">
     <div><div class="cfl">Facility</div><div class="cfv">Queensland X-Ray, Greenslopes</div><div class="cfsub">Dr Justin Morze (Cardiologist)<br>Dr John Fenwick (Radiologist)<br>Referred by Dr Jeremy Wright</div></div>
     <div><div class="cfl">CAC Score</div><div style="font-family:var(--mono);font-size:38px;font-weight:800;color:var(--warn);line-height:1">0.6</div><div class="cfsub">Below 50th percentile for age/sex</div></div>
@@ -349,155 +363,168 @@ body{background:var(--bg);color:var(--tp);font-family:-apple-system,'Segoe UI',I
 <!-- HEALTH & ACTIVITY -->
 <div id="tp-fitness" class="tp-p">
 
-  <!-- Google Fit bar -->
+  <!-- Google Fit bar + Edit Layout button -->
   <div class="gfit-bar">
     <div>
       <div class="gfit-title">&#127939; Google Fit</div>
-      <div class="gfit-sub" id="gfit-sub-text">Connect to sync steps, heart rate, sleep, blood pressure, weight, SpO&#8322; and more.</div>
+      <div class="gfit-sub" id="gfit-sub-text">Connect to sync steps, heart rate, blood pressure, weight, SpO&#8322; and more.</div>
     </div>
-    <div id="gfit-btn-wrap"></div>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <button class="edit-layout-btn" id="edit-layout-btn" onclick="toggleEditLayout()">&#8285; Edit Layout</button>
+      <div id="gfit-btn-wrap"></div>
+    </div>
   </div>
 
-  <!-- Stat bubbles -->
+  <!-- 6 stat bubbles (removed resp rate + sleep) -->
   <div class="stat-grid">
     <div class="fit-stat"><div class="fsv" id="stat-steps">&mdash;</div><div class="fsl">Steps (latest)</div><div class="fss">Target 10,000</div></div>
     <div class="fit-stat"><div class="fsv" id="stat-hr">&mdash;</div><div class="fsl">Resting HR</div><div class="fss">bpm</div></div>
-    <div class="fit-stat"><div class="fsv" id="stat-sleep">&mdash;</div><div class="fsl">Sleep (latest)</div><div class="fss">hours</div></div>
-    <div class="fit-stat"><div class="fsv" id="stat-bp" style="font-size:18px">&mdash;</div><div class="fsl">Blood Pressure</div><div class="fss">mmHg (latest)</div></div>
+    <div class="fit-stat"><div class="fsv" id="stat-bp" style="font-size:16px">&mdash;</div><div class="fsl">Blood Pressure</div><div class="fss">latest sys/dia/pulse</div></div>
     <div class="fit-stat"><div class="fsv" id="stat-spo2">&mdash;</div><div class="fsl">SpO&#8322; (Blood O&#8322;)</div><div class="fss">%</div></div>
-    <div class="fit-stat"><div class="fsv" id="stat-resp">&mdash;</div><div class="fsl">Respiratory Rate</div><div class="fss">breaths/min</div></div>
     <div class="fit-stat"><div class="fsv" id="stat-actmin">&mdash;</div><div class="fsl">Active Minutes</div><div class="fss">today</div></div>
     <div class="fit-stat"><div class="fsv" id="stat-cal">&mdash;</div><div class="fsl">Calories Burned</div><div class="fss">kcal today</div></div>
   </div>
 
-  <!-- Steps + HR -->
-  <div class="g2">
-    <div class="cc">
-      <div class="period-row">
-        <div><div class="ct">Daily Steps</div><div class="cs">Target 10,000/day</div></div>
-        <div class="period-btns">
-          <button class="pbtn" onclick="setPeriod('steps',7,this)">7D</button>
-          <button class="pbtn active" onclick="setPeriod('steps',30,this)">30D</button>
-          <button class="pbtn" onclick="setPeriod('steps',90,this)">90D</button>
-        </div>
-      </div>
-      <div class="form-section"><div class="fst">+ Log manually</div>
-        <div class="form-row">
-          <div class="fg"><div class="flbl">Date</div><input class="finp" type="date" id="f-steps-date"></div>
-          <div class="fg"><div class="flbl">Steps</div><input class="finp" type="number" id="f-steps-val" placeholder="8500"></div>
-          <button class="fbtn" onclick="addFit('steps')">Add</button>
-        </div>
-      </div>
-      <div class="cw"><canvas id="c-steps"></canvas></div>
-    </div>
-    <div class="cc">
-      <div class="period-row"><div><div class="ct">Resting Heart Rate</div><div class="cs">Healthy range active 55yo: 55&ndash;75 bpm</div></div></div>
-      <div class="form-section"><div class="fst">+ Log manually</div>
-        <div class="form-row">
-          <div class="fg"><div class="flbl">Date</div><input class="finp" type="date" id="f-hr-date"></div>
-          <div class="fg"><div class="flbl">BPM</div><input class="finp" type="number" id="f-hr-val" placeholder="62"></div>
-          <button class="fbtn" onclick="addFit('hr')">Add</button>
-        </div>
-      </div>
-      <div class="cw"><canvas id="c-hr"></canvas></div>
-    </div>
-  </div>
+  <!-- Sortable rows container -->
+  <div id="health-sortable">
 
-  <!-- Sleep + Blood Pressure -->
-  <div class="g2">
-    <div class="cc">
-      <div class="period-row"><div><div class="ct">Sleep Duration</div><div class="cs">Target 7&ndash;8 hours nightly</div></div></div>
-      <div class="form-section"><div class="fst">+ Log manually</div>
-        <div class="form-row">
-          <div class="fg"><div class="flbl">Date</div><input class="finp" type="date" id="f-sleep-date"></div>
-          <div class="fg"><div class="flbl">Hours</div><input class="finp" type="number" id="f-sleep-val" placeholder="7.5" step="0.5"></div>
-          <button class="fbtn" onclick="addFit('sleep')">Add</button>
-        </div>
-      </div>
-      <div class="cw"><canvas id="c-sleep"></canvas></div>
-    </div>
-    <div class="cc">
-      <div class="period-row">
-        <div>
-          <div class="ct">Blood Pressure</div>
-          <div class="cs">Target: systolic &lt;130 &middot; diastolic &lt;80</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:10px">
-          <div class="cls"><div class="cli"><div class="cld" style="background:#F87171"></div>Sys</div><div class="cli"><div class="cld" style="background:#38BDF8"></div>Dia</div></div>
+    <!-- ROW: Steps + HR -->
+    <div class="g2 sortable-row" data-id="row-steps-hr">
+      <div class="cc">
+        <div class="period-row">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="sort-handle" title="Drag to reorder">&#8801;</div>
+            <div><div class="ct">Daily Steps</div><div class="cs">Target 10,000/day</div></div>
+          </div>
           <div class="period-btns">
-            <button class="pbtn" onclick="setBPPeriod(7,this)">7D</button>
-            <button class="pbtn active" onclick="setBPPeriod(30,this)">30D</button>
-            <button class="pbtn" onclick="setBPPeriod(90,this)">90D</button>
+            <button class="pbtn" onclick="setPeriod('steps',7,this)">7D</button>
+            <button class="pbtn active" onclick="setPeriod('steps',30,this)">30D</button>
+            <button class="pbtn" onclick="setPeriod('steps',90,this)">90D</button>
           </div>
         </div>
-      </div>
-      <div class="form-section"><div class="fst">+ Log reading</div>
-        <div class="form-row">
-          <div class="fg"><div class="flbl">Date</div><input class="finp" type="date" id="f-bp-date"></div>
-          <div class="fg"><div class="flbl">Systolic</div><input class="finp" type="number" id="f-bp-sys" placeholder="118" style="min-width:70px"></div>
-          <div class="fg"><div class="flbl">Diastolic</div><input class="finp" type="number" id="f-bp-dia" placeholder="76" style="min-width:70px"></div>
-          <div class="fg"><div class="flbl">Pulse</div><input class="finp" type="number" id="f-bp-pulse" placeholder="65" style="min-width:60px"></div>
-          <button class="fbtn" onclick="addBP()">Add</button>
+        <div class="form-section"><div class="fst">+ Log manually</div>
+          <div class="form-row">
+            <div class="fg"><div class="flbl">Date</div><input class="finp" type="date" id="f-steps-date"></div>
+            <div class="fg"><div class="flbl">Steps</div><input class="finp" type="number" id="f-steps-val" placeholder="8500"></div>
+            <button class="fbtn" onclick="addFit('steps')">Add</button>
+          </div>
         </div>
+        <div class="cw"><canvas id="c-steps"></canvas></div>
       </div>
-      <div class="cw"><canvas id="c-bp"></canvas></div>
-    </div>
-  </div>
-
-  <!-- Weight + Respiratory Rate -->
-  <div class="g2">
-    <div class="cc">
-      <div class="period-row">
-        <div><div class="ct">Body Weight</div><div class="cs">From Google Fit &middot; BMI calculated at 185 cm</div></div>
-        <div class="cls"><div class="cli"><div class="cld" style="background:#38BDF8"></div>Weight (kg)</div><div class="cli"><div class="cld" style="background:#FBBF24"></div>BMI</div></div>
-      </div>
-      <div class="form-section"><div class="fst">+ Log manually</div>
-        <div class="form-row">
-          <div class="fg"><div class="flbl">Date</div><input class="finp" type="date" id="f-wt-date"></div>
-          <div class="fg"><div class="flbl">Weight (kg)</div><input class="finp" type="number" id="f-wt-val" placeholder="91.5" step="0.1"></div>
-          <button class="fbtn" onclick="addWt()">Add</button>
+      <div class="cc">
+        <div class="period-row">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="sort-handle" title="Drag to reorder">&#8801;</div>
+            <div><div class="ct">Resting Heart Rate</div><div class="cs">Healthy for active 55yo: 55&ndash;75 bpm</div></div>
+          </div>
         </div>
+        <div class="form-section"><div class="fst">+ Log manually</div>
+          <div class="form-row">
+            <div class="fg"><div class="flbl">Date</div><input class="finp" type="date" id="f-hr-date"></div>
+            <div class="fg"><div class="flbl">BPM</div><input class="finp" type="number" id="f-hr-val" placeholder="62"></div>
+            <button class="fbtn" onclick="addFit('hr')">Add</button>
+          </div>
+        </div>
+        <div class="cw"><canvas id="c-hr"></canvas></div>
       </div>
-      <div class="cw-t"><canvas id="c-weight"></canvas></div>
     </div>
-    <div class="cc">
-      <div class="period-row"><div><div class="ct">Respiratory Rate</div><div class="cs">Normal resting: 12&ndash;20 breaths/min &middot; From Google Fit</div></div></div>
-      <div class="cw-t"><canvas id="c-resp"></canvas></div>
-    </div>
-  </div>
 
-  <!-- SpO2 -->
+    <!-- ROW: Blood Pressure + Sleep -->
+    <div class="g2 sortable-row" data-id="row-bp-sleep">
+      <div class="cc">
+        <div class="period-row">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="sort-handle" title="Drag to reorder">&#8801;</div>
+            <div>
+              <div class="ct">Blood Pressure</div>
+              <div class="cs">Target: systolic &lt;130 &middot; diastolic &lt;80</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="cls"><div class="cli"><div class="cld" style="background:#F87171"></div>Sys</div><div class="cli"><div class="cld" style="background:#38BDF8"></div>Dia</div><div class="cli"><div class="cld" style="background:#FBBF24"></div>Pulse</div></div>
+            <div class="period-btns">
+              <button class="pbtn" onclick="setBPPeriod(7,this)">7D</button>
+              <button class="pbtn active" onclick="setBPPeriod(30,this)">30D</button>
+              <button class="pbtn" onclick="setBPPeriod(90,this)">90D</button>
+            </div>
+          </div>
+        </div>
+        <div class="form-section"><div class="fst">+ Log reading (Google Fit BP auto-syncs; pulse from manual entry only)</div>
+          <div class="form-row">
+            <div class="fg"><div class="flbl">Date</div><input class="finp" type="date" id="f-bp-date"></div>
+            <div class="fg"><div class="flbl">Systolic</div><input class="finp" type="number" id="f-bp-sys" placeholder="118" style="min-width:70px"></div>
+            <div class="fg"><div class="flbl">Diastolic</div><input class="finp" type="number" id="f-bp-dia" placeholder="76" style="min-width:70px"></div>
+            <div class="fg"><div class="flbl">Pulse</div><input class="finp" type="number" id="f-bp-pulse" placeholder="65" style="min-width:60px"></div>
+            <button class="fbtn" onclick="addBP()">Add</button>
+          </div>
+        </div>
+        <div class="cw"><canvas id="c-bp"></canvas></div>
+      </div>
+      <div class="cc">
+        <div class="period-row">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="sort-handle" title="Drag to reorder">&#8801;</div>
+            <div><div class="ct">Sleep Duration</div><div class="cs">Target 7&ndash;8 hours &middot; Manual entry or wearable via Google Fit</div></div>
+          </div>
+        </div>
+        <div class="form-section"><div class="fst">+ Log manually</div>
+          <div class="form-row">
+            <div class="fg"><div class="flbl">Date</div><input class="finp" type="date" id="f-sleep-date"></div>
+            <div class="fg"><div class="flbl">Hours</div><input class="finp" type="number" id="f-sleep-val" placeholder="7.5" step="0.5"></div>
+            <button class="fbtn" onclick="addFit('sleep')">Add</button>
+          </div>
+        </div>
+        <div class="cw"><canvas id="c-sleep"></canvas></div>
+      </div>
+    </div>
+
+    <!-- ROW: Weight + SpO2 -->
+    <div class="g2 sortable-row" data-id="row-wt-spo2">
+      <div class="cc">
+        <div class="period-row">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="sort-handle" title="Drag to reorder">&#8801;</div>
+            <div><div class="ct">Body Weight</div><div class="cs">From Google Fit &middot; BMI calculated at 185 cm</div></div>
+          </div>
+          <div class="cls"><div class="cli"><div class="cld" style="background:#38BDF8"></div>kg</div><div class="cli"><div class="cld" style="background:#FBBF24"></div>BMI</div></div>
+        </div>
+        <div class="form-section"><div class="fst">+ Log manually</div>
+          <div class="form-row">
+            <div class="fg"><div class="flbl">Date</div><input class="finp" type="date" id="f-wt-date"></div>
+            <div class="fg"><div class="flbl">Weight (kg)</div><input class="finp" type="number" id="f-wt-val" placeholder="91.5" step="0.1"></div>
+            <button class="fbtn" onclick="addWt()">Add</button>
+          </div>
+        </div>
+        <div class="cw-t"><canvas id="c-weight"></canvas></div>
+      </div>
+      <div class="cc">
+        <div class="period-row">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="sort-handle" title="Drag to reorder">&#8801;</div>
+            <div><div class="ct">Blood Oxygen (SpO&#8322;)</div><div class="cs">Normal: 95&ndash;100% &middot; Below 95% warrants attention</div></div>
+          </div>
+        </div>
+        <div class="cw"><canvas id="c-spo2"></canvas></div>
+      </div>
+    </div>
+
+  </div><!-- end health-sortable -->
+
+  <!-- BP table + Reminders -->
   <div class="g2">
-    <div class="cc">
-      <div class="period-row"><div><div class="ct">Blood Oxygen (SpO&#8322;)</div><div class="cs">Normal: 95&ndash;100% &middot; Below 95% warrants attention</div></div></div>
-      <div class="cw"><canvas id="c-spo2"></canvas></div>
+    <div class="card">
+      <div class="ctitle">&#128203; Recent BP Readings</div>
+      <div id="bp-table-wrap"><div class="no-data"><div class="nd-icon">&#10084;&#65039;</div>No readings yet. Add a reading or sync Google Fit.</div></div>
+      <div style="margin-top:10px;font-size:10px;color:var(--tm);line-height:1.6">
+        <strong style="color:var(--ts)">AHA/ACC:</strong> Normal &lt;120/80 &middot; Elevated 120&ndash;129/&lt;80 &middot; Stage 1: 130&ndash;139/80&ndash;89 &middot; Stage 2: &ge;140/&ge;90<br>
+        <em>Note: Google Fit does not transmit pulse with BP readings. Pulse column populated from manual entries only.</em>
+      </div>
     </div>
     <div class="card">
       <div class="ctitle">&#128138; Daily Supplement &amp; Medication Reminders</div>
       <div class="ctitle" style="margin-bottom:6px">&#9201; Today &mdash; <span id="rem-date"></span></div>
       <div id="rem-list" style="display:flex;flex-direction:column;gap:7px"></div>
       <div style="font-size:10px;color:var(--tm);text-align:center;margin-top:8px">Resets at midnight &middot; <button onclick="resetRem()" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:10px;text-decoration:underline">Reset</button></div>
-    </div>
-  </div>
-
-  <!-- BP table -->
-  <div class="g2">
-    <div class="card">
-      <div class="ctitle">&#128203; Recent BP Readings</div>
-      <div id="bp-table-wrap"><div class="no-data"><div class="nd-icon">&#10084;</div>No readings yet.</div></div>
-      <div style="margin-top:10px;font-size:10px;color:var(--tm);line-height:1.6">
-        <strong style="color:var(--ts)">AHA/ACC:</strong> Normal &lt;120/80 &middot; Elevated 120&ndash;129/&lt;80 &middot; Stage 1: 130&ndash;139/80&ndash;89 &middot; Stage 2: &ge;140/&ge;90
-      </div>
-    </div>
-    <div class="card">
-      <div class="ctitle">&#128172; Timing Guide &mdash; Daily Supplements</div>
-      <div style="font-size:11px;color:var(--ts);line-height:1.7;display:flex;flex-direction:column;gap:7px">
-        <div><strong style="color:var(--accent)">Rosuvastatin</strong> &mdash; evening, consistent time</div>
-        <div><strong style="color:var(--accent)">NMN</strong> &mdash; morning, fasting or light breakfast</div>
-        <div><strong style="color:var(--accent)">Berberine</strong> &mdash; with largest meal</div>
-        <div><strong style="color:var(--accent)">Krill Oil</strong> &mdash; with fat-containing meal</div>
-        <div><strong style="color:var(--accent)">Creatine (planned)</strong> &mdash; post-workout or any time</div>
-      </div>
     </div>
   </div>
 
@@ -523,7 +550,7 @@ body{background:var(--bg);color:var(--tp);font-family:-apple-system,'Segoe UI',I
     <div>
       <div class="st">&#8853; Active Conditions</div>
       <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px">
-        <div class="card" style="padding:11px;border-color:rgba(248,113,113,0.3)"><div style="font-size:11px;font-weight:700;color:var(--bad);margin-bottom:2px">&#129756; Coronary Artery Disease &mdash; Early Stage</div><div style="font-size:10px;color:var(--ts)">Noncalcified plaque LAD (&times;2) + RCA. Myocardial bridge. Rosuvastatin + lifestyle. 3-month cardiologist cycle.</div></div>
+        <div class="card" style="padding:11px;border-color:rgba(248,113,113,0.3)"><div style="font-size:11px;font-weight:700;color:var(--bad);margin-bottom:2px">&#10084;&#65039; Coronary Artery Disease &mdash; Early Stage</div><div style="font-size:10px;color:var(--ts)">Noncalcified plaque LAD (&times;2) + RCA. Myocardial bridge. Rosuvastatin + lifestyle. 3-month cardiologist cycle.</div></div>
         <div class="card" style="padding:11px"><div style="font-size:11px;font-weight:700;color:var(--tp);margin-bottom:2px">&#9646; GORD + Prior Fundoplication</div><div style="font-size:10px;color:var(--ts)">Nissen fundoplication satisfactory. Microscopic reflux oesophagitis. No H. pylori.</div></div>
         <div class="card" style="padding:11px"><div style="font-size:11px;font-weight:700;color:var(--tp);margin-bottom:2px">&#9889; Colonic Diverticulosis</div><div style="font-size:10px;color:var(--ts)">Sigmoid + descending. Polyp removed 2024 &mdash; benign. Surveillance March 2027.</div></div>
         <div class="card" style="padding:11px"><div style="font-size:11px;font-weight:700;color:var(--tp);margin-bottom:2px">&#128067; Chronic Sinusitis</div><div style="font-size:10px;color:var(--ts)">Bilateral ostiomeatal obstruction. Possible silent sinus syndrome. Right septal deviation.</div></div>
@@ -551,7 +578,7 @@ body{background:var(--bg);color:var(--tp);font-family:-apple-system,'Segoe UI',I
       <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px">
         <div class="dc"><div class="dav">&#128104;&#8205;&#9877;&#65039;</div><div><div class="dn">Dr Jeremy Wright</div><div class="dr">General Practitioner &mdash; Primary Care</div><div class="do">Allied Health Services, Newdegate St, Greenslopes QLD 4120</div></div></div>
         <div class="dc"><div class="dav">&#9877;&#65039;</div><div><div class="dn">Dr Phillip Wuth</div><div class="dr">GP / Specialist Coordinator (CC)</div><div class="do">Greenslopes &mdash; dermatology, GI, sinus referrals</div></div></div>
-        <div class="dc"><div class="dav">&#129756;</div><div><div class="dn">Dr Justin Morze</div><div class="dr">Cardiologist</div><div class="do">Queensland X-Ray, Greenslopes &mdash; CTCA + cardiac follow-up</div></div></div>
+        <div class="dc"><div class="dav">&#10084;&#65039;</div><div><div class="dn">Dr Justin Morze</div><div class="dr">Cardiologist</div><div class="do">Queensland X-Ray, Greenslopes &mdash; CTCA + cardiac follow-up</div></div></div>
         <div class="dc"><div class="dav">&#128247;</div><div><div class="dn">Dr John Fenwick</div><div class="dr">Diagnostic &amp; Interventional Radiologist</div><div class="do">Queensland X-Ray &mdash; CTCA reporting</div></div></div>
         <div class="dc"><div class="dav">&#128300;</div><div><div class="dn">Dr Aidan Woodward</div><div class="dr">Gastroenterologist</div><div class="do">Queensland Gastroenterology, Greenslopes Private</div></div></div>
         <div class="dc"><div class="dav">&#128299;</div><div><div class="dn">Dr Renu Vohra</div><div class="dr">Pathologist &mdash; QML Pathology</div><div class="do">Reporting pathologist for all monitoring panels</div></div></div>
@@ -567,7 +594,7 @@ body{background:var(--bg);color:var(--tp);font-family:-apple-system,'Segoe UI',I
         <div class="ui"><div class="udate">3 months</div><div class="uico">&#128202;</div><div><div class="utxt">CK + LFTs + eGFR Recheck</div><div class="usub">Full supplement stack monitoring</div></div><div class="upri w">Schedule</div></div>
         <div class="ui"><div class="udate">Next GP</div><div class="uico">&#128138;</div><div><div class="utxt">Berberine Dose Review</div><div class="usub">750&#8594;1000&ndash;1500 mg/day split dosing</div></div><div class="upri w">Discuss</div></div>
         <div class="ui"><div class="udate">Annual</div><div class="uico">&#9728;</div><div><div class="utxt">Full Skin Check</div><div class="usub">Solar keratosis history</div></div><div class="upri b">Annual</div></div>
-        <div class="ui"><div class="udate">Quarterly</div><div class="uico">&#129756;</div><div><div class="utxt">Cardiologist Review</div><div class="usub">3-month cycle &mdash; Dr Justin Morze</div></div><div class="upri b">Routine</div></div>
+        <div class="ui"><div class="udate">Quarterly</div><div class="uico">&#10084;&#65039;</div><div><div class="utxt">Cardiologist Review</div><div class="usub">3-month cycle &mdash; Dr Justin Morze</div></div><div class="upri b">Routine</div></div>
       </div>
       <div class="st">&#128992; Critical Safety Thresholds</div>
       <div class="card" style="border-color:rgba(248,113,113,0.25)">
@@ -763,14 +790,18 @@ function initFitness() {
   const t = new Date().toISOString().split('T')[0];
   ['steps','hr','sleep','bp','wt'].forEach(k=>{const el=document.getElementById('f-'+k+'-date');if(el)el.value=t;});
   fKeys.forEach(k => {
-    const cfg  = fCfg[k];
-    const all  = store.get('fit_'+k,[]);
-    const data = filterDays(all, 30);
-    const ds   = [{label:k,data:data.map(d=>d.v),borderColor:cfg.color,backgroundColor:cfg.type==='bar'?cfg.color+'99':'transparent',tension:0.3,pointRadius:3,borderRadius:3}];
-    if (cfg.tgt) ds.push({data:Array(Math.max(data.length,1)).fill(cfg.tgt),borderColor:'rgba(56,189,248,0.35)',borderDash:[5,5],pointRadius:0,tension:0});
-    fC[k]=new Chart(document.getElementById('c-'+k),{type:cfg.type||'line',data:{labels:data.map(d=>d.date),datasets:ds},options:gc(cfg.yL)});
-    chartPeriods[k]=30;
-    if (all.length) updStat(k,all[all.length-1].v);
+    try {
+      const cfg  = fCfg[k];
+      const all  = store.get('fit_'+k,[]);
+      const data = filterDays(all, 30);
+      const canvas = document.getElementById('c-'+k);
+      if (!canvas) { console.warn('Canvas not found: c-'+k); return; }
+      const ds = [{label:k,data:data.map(d=>d.v),borderColor:cfg.color,backgroundColor:cfg.type==='bar'?cfg.color+'99':'transparent',tension:0.3,pointRadius:3,borderRadius:3}];
+      if (cfg.tgt) ds.push({data:Array(Math.max(data.length,1)).fill(cfg.tgt),borderColor:'rgba(56,189,248,0.35)',borderDash:[5,5],pointRadius:0,tension:0});
+      fC[k]=new Chart(canvas,{type:cfg.type||'line',data:{labels:data.map(d=>d.date),datasets:ds},options:gc(cfg.yL)});
+      chartPeriods[k]=30;
+      if (all.length) updStat(k,all[all.length-1].v);
+    } catch(e) { console.error('Chart init error ('+k+'):', e); }
   });
   // BP chart
   const bpAll = store.get('fit_bp',[]);
@@ -781,11 +812,7 @@ function initFitness() {
   // Weight chart
   const wtAll = store.get('fit_wt',[]);
   wtC = new Chart(document.getElementById('c-weight'),{type:'line',data:{labels:wtAll.map(d=>d.date),datasets:[ls(wtAll.map(d=>d.kg),'#38BDF8',0.35,true),{data:wtAll.map(d=>d.bmi),borderColor:'#FBBF24',backgroundColor:'transparent',tension:0.35,pointRadius:2,yAxisID:'y2'}]},options:{...gc('kg'),scales:{...gc().scales,y2:{position:'right',grid:{display:false},title:{display:true,text:'BMI',color:'#64748B'}}}}});
-  // Resp Rate chart
-  const respAll = store.get('fit_resp',[]);
-  const respChart = new Chart(document.getElementById('c-resp'),{type:'line',data:{labels:respAll.map(d=>d.date),datasets:[ls(respAll.map(d=>d.v),'#A78BFA',0.35,true)]},options:gc('breaths/min',8,30)});
-  fC['resp'] = respChart;
-  if (respAll.length) updStat('resp',respAll[respAll.length-1].v);
+  // Respiratory rate removed (scope not available in Google Fit API)
   // SpO2 chart
   const spo2All = store.get('fit_spo2',[]);
   const spo2Chart = new Chart(document.getElementById('c-spo2'),{type:'line',data:{labels:spo2All.map(d=>d.date),datasets:[ls(spo2All.map(d=>d.v),'#34D399',0.35,true),{data:Array(Math.max(spo2All.length,2)).fill(95),borderColor:'rgba(248,113,113,.35)',borderDash:[4,4],pointRadius:0,tension:0}]},options:gc('%',85,102)});
@@ -793,29 +820,82 @@ function initFitness() {
   if (spo2All.length) updStat('spo2',spo2All[spo2All.length-1].v+'%');
   renderRem();
   document.getElementById('rem-date').textContent=new Date().toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'});
+  // Init drag-to-reorder
+  try {
+    if (window.Sortable) {
+      const container = document.getElementById('health-sortable');
+      // Restore saved row order
+      const savedOrder = store.get('row_order', null);
+      if (savedOrder && Array.isArray(savedOrder)) {
+        savedOrder.forEach(id => {
+          const el = container.querySelector('[data-id="'+id+'"]');
+          if (el) container.appendChild(el);
+        });
+      }
+      Sortable.create(container, {
+        animation: 150,
+        handle: '.sort-handle',
+        ghostClass: 'sort-ghost',
+        onEnd: () => {
+          const order = Array.from(container.querySelectorAll('.sortable-row')).map(r=>r.dataset.id);
+          store.set('row_order', order);
+        }
+      });
+    }
+  } catch(e) { console.error('Sortable init error:', e); }
+}
+
+function toggleEditLayout() {
+  const editing = document.body.classList.toggle('edit-mode');
+  const btn = document.getElementById('edit-layout-btn');
+  if (btn) btn.textContent = editing ? '&#10003; Done Editing' : '&#8285; Edit Layout';
 }
 
 function updStat(k, v) {
   const el = document.getElementById('stat-'+k);
-  if (el) el.textContent = k==='steps'?Number(v).toLocaleString():v;
+  if (!el) return;
+  if (k==='steps') el.textContent = typeof v==='number'?v.toLocaleString():v;
+  else el.textContent = v;
+}
+function updBPStat(sys, dia, pulse) {
+  const el = document.getElementById('stat-bp');
+  if (!el) return;
+  el.textContent = pulse ? sys+'/'+dia+'/'+pulse : sys+'/'+dia;
+  el.title = 'Systolic: '+sys+' / Diastolic: '+dia + (pulse?' / Pulse: '+pulse:'');
 }
 
 function addFit(k) {
-  const date=document.getElementById('f-'+k+'-date').value;
-  const val=parseFloat(document.getElementById('f-'+k+'-val').value);
-  if (!date||isNaN(val)) return;
-  const ts=date;
-  const dispDate=new Date(date).toLocaleDateString('en-AU',{day:'numeric',month:'short'});
-  const all=store.get('fit_'+k,[]);
-  all.push({date:dispDate,ts,v:val});
-  all.sort((a,b)=>(a.ts||'').localeCompare(b.ts||''));
-  store.set('fit_'+k,all);
-  const days=chartPeriods[k]||30;
-  const f=filterDays(all,days);
-  const ch=fC[k];
-  if (ch) { ch.data.labels=f.map(d=>d.date); ch.data.datasets[0].data=f.map(d=>d.v); if(ch.data.datasets[1]&&fCfg[k]&&fCfg[k].tgt)ch.data.datasets[1].data=Array(f.length).fill(fCfg[k].tgt); ch.update(); }
-  updStat(k,val);
-  document.getElementById('f-'+k+'-val').value='';
+  try {
+    const dateEl = document.getElementById('f-'+k+'-date');
+    const valEl  = document.getElementById('f-'+k+'-val');
+    if (!dateEl||!valEl) { console.error('Form elements not found for', k); return; }
+    const date = dateEl.value;
+    const val  = parseFloat(valEl.value);
+    if (!date) { alert('Please select a date'); return; }
+    if (isNaN(val)) { alert('Please enter a valid number'); return; }
+    const ts = date;
+    const dispDate = new Date(date+'T12:00:00').toLocaleDateString('en-AU',{day:'numeric',month:'short'});
+    const all = store.get('fit_'+k,[]);
+    // Remove existing entry for same day (replace it)
+    const filtered = all.filter(d=>d.ts !== ts);
+    filtered.push({date:dispDate,ts,v:val});
+    filtered.sort((a,b)=>(a.ts||'').localeCompare(b.ts||''));
+    store.set('fit_'+k, filtered);
+    // Update chart
+    const days = chartPeriods[k]||30;
+    const f = filterDays(filtered, days);
+    const ch = fC[k];
+    if (ch) {
+      ch.data.labels = f.map(d=>d.date);
+      ch.data.datasets[0].data = f.map(d=>d.v);
+      if (ch.data.datasets[1]&&fCfg[k]&&fCfg[k].tgt) ch.data.datasets[1].data=Array(f.length).fill(fCfg[k].tgt);
+      ch.update();
+    } else {
+      console.warn('Chart not initialized yet for', k, '— data saved, refresh tab to see chart');
+    }
+    updStat(k, k==='steps'?val.toLocaleString():val);
+    valEl.value = '';
+  } catch(e) { console.error('addFit error:', e); }
 }
 
 function setBPPeriod(days, btn) {
@@ -909,7 +989,9 @@ async function syncGFit() {
     if (sr.ok) {
       const sd = await sr.json();
       const steps = sd.bucket.map(b=>{
-        return {date:new Date(parseInt(b.startTimeMillis)).toLocaleDateString('en-AU',{day:'numeric',month:'short'}), v:b.dataset[0]?.point?.[0]?.value?.[0]?.intVal||0};
+        const ts = new Date(parseInt(b.startTimeMillis)).toISOString().split('T')[0];
+        const v  = b.dataset[0]?.point?.reduce((s,p)=>s+(p.value?.[0]?.intVal||0),0)||0;
+        return {date:new Date(parseInt(b.startTimeMillis)).toLocaleDateString('en-AU',{day:'numeric',month:'short'}), ts, v};
       }).filter(d=>d.v>0);
       if (steps.length) {
         store.set('fit_steps', steps);
@@ -925,8 +1007,13 @@ async function syncGFit() {
     if (hr.ok) {
       const hd = await hr.json();
       const hrs = hd.bucket.map(b=>{
-        return {date:new Date(parseInt(b.startTimeMillis)).toLocaleDateString('en-AU',{day:'numeric',month:'short'}), v:Math.round(b.dataset[0]?.point?.[0]?.value?.[0]?.fpVal||0)};
-      }).filter(d=>d.v>0);
+        const pts = b.dataset[0]?.point || [];
+        if (!pts.length) return null;
+        const vals = pts.map(p=>p.value?.[0]?.fpVal||0).filter(v=>v>0);
+        if (!vals.length) return null;
+        const ts = new Date(parseInt(b.startTimeMillis)).toISOString().split('T')[0];
+        return {date:new Date(parseInt(b.startTimeMillis)).toLocaleDateString('en-AU',{day:'numeric',month:'short'}), ts, v:Math.round(Math.min(...vals))};
+      }).filter(d=>d&&d.v>30&&d.v<220);
       if (hrs.length) {
         store.set('fit_hr', hrs);
         updStat('hr', hrs[hrs.length-1].v);
@@ -1115,7 +1202,7 @@ function addBP() {
   const days=30; const f=filterDays(data,days);
   const n=Math.max(f.length,2);
   if (bpC) { bpC.data.labels=f.map(d=>d.date); bpC.data.datasets[0].data=f.map(d=>d.sys); bpC.data.datasets[1].data=f.map(d=>d.dia); bpC.data.datasets[2].data=Array(n).fill(130); bpC.data.datasets[3].data=Array(n).fill(80); bpC.update(); }
-  updStat('bp',sys+'/'+dia);
+  updBPStat(sys, dia, pulse);
   renderBPT(data);
   ['f-bp-sys','f-bp-dia','f-bp-pulse'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
 }
@@ -1126,9 +1213,12 @@ function renderBPT(data) {
   if(!data||!data.length){w.innerHTML='<div class="no-data"><div class="nd-icon">&#10084;</div>No readings yet.</div>';return;}
   const rows=data.slice(-8).reverse().map(d=>{
     const c=d.sys<120?'var(--good)':d.sys<130?'var(--warn)':'var(--bad)';
-    return `<tr><td style="font-family:var(--mono)">${d.date}</td><td style="font-family:var(--mono);color:${c};font-weight:700">${d.sys}</td><td style="font-family:var(--mono)">${d.dia}</td><td style="font-family:var(--mono)">${d.pulse||'&mdash;'}</td></tr>`;
+    const cls=d.sys<120?'var(--good)':d.sys<130?'var(--warn)':'var(--bad)';
+    return `<tr><td style="font-family:var(--mono)">${d.date}</td><td style="font-family:var(--mono);color:${c};font-weight:700">${d.sys}</td><td style="font-family:var(--mono)">${d.dia}</td><td style="font-family:var(--mono);color:var(--ts)">${d.pulse||'<span style="color:var(--tm)">&mdash;</span>'}</td></tr>`;
   }).join('');
-  w.innerHTML=`<table class="rtbl"><thead><tr><th>Date</th><th>Systolic</th><th>Diastolic</th><th>Pulse</th></tr></thead><tbody>${rows}</tbody></table>`;
+  // Update stat bubble with latest
+  if (data.length) { const last=data[data.length-1]; updBPStat(last.sys,last.dia,last.pulse); }
+  w.innerHTML=`<table class="rtbl"><thead><tr><th>Date</th><th>Systolic</th><th>Diastolic</th><th>Pulse (manual)</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
 function addWt() {
