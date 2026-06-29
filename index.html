@@ -900,7 +900,7 @@ function discGFit() {
 async function syncGFit() {
   const token = getGFitToken();
   if (!token) { setGFitUI(false); return; }
-  const now = Date.now(), d30 = now - 30*86400000;
+  const now = Date.now(), d30 = now - 30*86400000, d90 = now - 90*86400000;
   try {
     // Steps
     const sr = await fetch('https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate',{
@@ -979,12 +979,91 @@ async function syncGFit() {
     });
     if(wtRes.ok){const wd=await wtRes.json();const wtData=wd.bucket.map(b=>{const pts=b.dataset[0]?.point||[];if(!pts.length)return null;const kg=Math.round(pts[0].value?.[0]?.fpVal*10)/10;if(!kg)return null;const bmi=Math.round((kg/3.4225)*10)/10;const ts=new Date(parseInt(b.startTimeMillis)).toISOString().split('T')[0];return{date:new Date(parseInt(b.startTimeMillis)).toLocaleDateString('en-AU',{day:'numeric',month:'short'}),kg,bmi,ts};}).filter(d=>d&&d.kg>30&&d.kg<300);if(wtData.length){store.set('fit_wt',wtData);if(window._ft&&wtC){wtC.data.labels=wtData.map(d=>d.date);wtC.data.datasets[0].data=wtData.map(d=>d.kg);wtC.data.datasets[1].data=wtData.map(d=>d.bmi);wtC.update();}}}
 
-    // ── BLOOD PRESSURE from Google Fit ──
-    const bpRes = await fetch('https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate',{
-      method:'POST',headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
-      body:JSON.stringify({aggregateBy:[{dataTypeName:'com.google.blood_pressure'}],bucketByTime:{durationMillis:86400000},startTimeMillis:d30,endTimeMillis:now})
-    });
-    if(bpRes.ok){const bpd=await bpRes.json();const bpPoints=[];bpd.bucket.forEach(b=>{const pts=b.dataset[0]?.point||[];pts.forEach(p=>{const sys=Math.round(p.value?.[0]?.fpVal||0);const dia=Math.round(p.value?.[1]?.fpVal||0);if(sys>60&&dia>30){const ts=new Date(parseInt(b.startTimeMillis)).toISOString().split('T')[0];bpPoints.push({date:new Date(parseInt(b.startTimeMillis)).toLocaleDateString('en-AU',{day:'numeric',month:'short'}),sys,dia,pulse:null,ts});}});});if(bpPoints.length){store.set('fit_bp',bpPoints);const last=bpPoints[bpPoints.length-1];updStat('bp',last.sys+'/'+last.dia);renderBPT(bpPoints);if(window._ft&&bpC){const f=filterDays(bpPoints,30);const n=Math.max(f.length,2);bpC.data.labels=f.map(d=>d.date);bpC.data.datasets[0].data=f.map(d=>d.sys);bpC.data.datasets[1].data=f.map(d=>d.dia);bpC.data.datasets[2].data=Array(n).fill(130);bpC.data.datasets[3].data=Array(n).fill(80);bpC.update();}}}
+    // ── BLOOD PRESSURE — discover sources first, then read directly ──
+    try {
+      let bpPoints = [];
+      // Step 1: Discover what BP data sources exist on this account
+      const dsRes = await fetch(
+        'https://www.googleapis.com/fitness/v1/users/me/dataSources?dataTypeName=com.google.blood_pressure',
+        {headers:{'Authorization':'Bearer '+token}}
+      );
+      if (dsRes.ok) {
+        const dsData = await dsRes.json();
+        const bpSources = dsData.dataSource || [];
+        console.log('[BP] Sources found:', bpSources.length, bpSources.map(s=>s.dataStreamId));
+        // Step 2: Read each source directly using nanosecond dataset ID
+        const startNs = (d90 * 1000000).toString();
+        const endNs   = (now  * 1000000).toString();
+        for (const src of bpSources) {
+          const encId   = encodeURIComponent(src.dataStreamId);
+          const dataRes = await fetch(
+            `https://www.googleapis.com/fitness/v1/users/me/dataSources/${encId}/datasets/${startNs}-${endNs}`,
+            {headers:{'Authorization':'Bearer '+token}}
+          );
+          if (dataRes.ok) {
+            const dd  = await dataRes.json();
+            const pts = dd.point || [];
+            console.log('[BP]', src.dataStreamId, ':', pts.length, 'readings');
+            pts.forEach(p => {
+              const sys = Math.round(p.value?.[0]?.fpVal || 0);
+              const dia = Math.round(p.value?.[1]?.fpVal || 0);
+              if (sys > 60 && dia > 30) {
+                const ms  = Math.round(parseInt(p.startTimeNanos) / 1000000);
+                const dt  = new Date(ms);
+                bpPoints.push({
+                  date:  dt.toLocaleDateString('en-AU',{day:'numeric',month:'short'}),
+                  sys, dia, pulse: null,
+                  ts:    dt.toISOString().split('T')[0]
+                });
+              }
+            });
+          }
+        }
+      }
+      // Step 3: Fallback — aggregate endpoint (works if data was written directly to Google Fit cloud)
+      if (!bpPoints.length) {
+        console.log('[BP] No sources found via discovery — trying aggregate fallback');
+        const aggRes = await fetch('https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate',{
+          method:'POST', headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
+          body:JSON.stringify({aggregateBy:[{dataTypeName:'com.google.blood_pressure'}],bucketByTime:{durationMillis:86400000},startTimeMillis:d90,endTimeMillis:now})
+        });
+        if (aggRes.ok) {
+          const bpd = await aggRes.json();
+          bpd.bucket.forEach(b=>{
+            (b.dataset[0]?.point||[]).forEach(p=>{
+              const sys=Math.round(p.value?.[0]?.fpVal||0);
+              const dia=Math.round(p.value?.[1]?.fpVal||0);
+              if(sys>60&&dia>30){
+                const ts=new Date(parseInt(b.startTimeMillis)).toISOString().split('T')[0];
+                bpPoints.push({date:new Date(parseInt(b.startTimeMillis)).toLocaleDateString('en-AU',{day:'numeric',month:'short'}),sys,dia,pulse:null,ts});
+              }
+            });
+          });
+        }
+      }
+      // Step 4: Store and display if we got data
+      if (bpPoints.length) {
+        bpPoints.sort((a,b)=>a.ts.localeCompare(b.ts));
+        // Deduplicate by day (keep last reading of each day)
+        const deduped = {};
+        bpPoints.forEach(p=>{ deduped[p.ts]=p; });
+        const finalBP = Object.values(deduped).sort((a,b)=>a.ts.localeCompare(b.ts));
+        store.set('fit_bp', finalBP);
+        const last = finalBP[finalBP.length-1];
+        updStat('bp', last.sys+'/'+last.dia);
+        renderBPT(finalBP);
+        if (window._ft && bpC) {
+          const f=filterDays(finalBP,30); const n=Math.max(f.length,2);
+          bpC.data.labels=f.map(d=>d.date); bpC.data.datasets[0].data=f.map(d=>d.sys);
+          bpC.data.datasets[1].data=f.map(d=>d.dia);
+          bpC.data.datasets[2].data=Array(n).fill(130); bpC.data.datasets[3].data=Array(n).fill(80);
+          bpC.update();
+        }
+        console.log('[BP] Loaded', finalBP.length, 'readings. Latest:', last.sys+'/'+last.dia);
+      } else {
+        console.log('[BP] No data found. Your BP data may be in Health Connect only and not accessible via the Google Fit REST API. Use manual entry as fallback.');
+      }
+    } catch(bpErr) { console.error('[BP] Error:', bpErr); }
 
     // ── RESPIRATORY RATE ──
     const rrRes = await fetch('https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate',{
