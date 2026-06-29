@@ -187,21 +187,27 @@ body{background:var(--bg);color:var(--tp);font-family:-apple-system,'Segoe UI',I
 .pbtn:hover{border-color:var(--accent);color:var(--accent)}
 .pbtn.active{background:var(--accent);border-color:var(--accent);color:#fff}
 /* ── STAT BUBBLE EXTRAS ── */
-.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
 .stat-wide{grid-column:span 2}
 
 
-/* ── DRAG-TO-REORDER ── */
-.sort-handle{display:none;align-items:center;justify-content:center;width:28px;height:28px;cursor:grab;color:var(--tm);font-size:16px;border-radius:6px;background:var(--s2);border:1px solid var(--border);flex-shrink:0;user-select:none}
-.sort-handle:hover{color:var(--accent);border-color:var(--accent)}
-.sort-handle:active{cursor:grabbing}
-body.edit-mode .sort-handle{display:flex}
-body.edit-mode .sortable-row{border:1px dashed rgba(56,189,248,0.35) !important;border-radius:var(--r);padding:6px;margin-bottom:4px}
-.sort-ghost{opacity:0.4;background:var(--aglow) !important}
+/* ── EDIT LAYOUT MODE ── */
 .edit-layout-btn{padding:6px 12px;background:var(--s2);border:1px solid var(--border);border-radius:var(--rs);font-size:11px;font-weight:600;color:var(--ts);cursor:pointer;transition:all .2s}
-.edit-layout-btn:hover,.edit-layout-btn.active{border-color:var(--accent);color:var(--accent)}
-.row-header{display:flex;align-items:center;gap:8px;margin-bottom:10px}
-.row-header-title{font-size:11px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:.08em;flex:1}
+.edit-layout-btn:hover{border-color:var(--accent);color:var(--accent)}
+.edit-layout-btn.is-editing{background:var(--aglow);border-color:var(--accent);color:var(--accent)}
+.edit-bar{display:none;align-items:center;gap:10px;padding:9px 14px;background:var(--s2);border:1px solid var(--accent);border-radius:var(--r) var(--r) 0 0;cursor:grab;user-select:none;margin-bottom:-1px;position:relative;z-index:1}
+.edit-bar:active{cursor:grabbing}
+body.edit-mode .edit-bar{display:flex}
+body.edit-mode .sortable-item{border:1px dashed rgba(56,189,248,0.25);border-radius:var(--r);margin-bottom:6px}
+.drag-icon{font-size:18px;color:var(--accent);flex-shrink:0;line-height:1}
+.edit-bar-label{flex:1;font-size:11px;font-weight:700;color:var(--tp);letter-spacing:.02em}
+.hide-row-btn{padding:3px 10px;background:var(--s1);border:1px solid var(--border);border-radius:6px;font-size:10px;font-weight:600;color:var(--ts);cursor:pointer;transition:all .2s;white-space:nowrap}
+.hide-row-btn:hover{border-color:var(--bad);color:var(--bad)}
+.hide-row-btn.row-is-hidden{background:var(--rbg);border-color:var(--bad);color:var(--bad)}
+.sortable-item.row-hidden .g2{display:none}
+.sortable-item.row-hidden .cc{display:none}
+.sortable-item.row-hidden .edit-bar{background:var(--rbg);border-style:solid;border-color:rgba(248,113,113,0.4)}
+.sort-ghost{opacity:0.35;background:var(--aglow);border-radius:var(--r)}
 
 /* ── SCROLLBAR ── */
 ::-webkit-scrollbar{width:4px;height:4px}
@@ -236,9 +242,9 @@ body.edit-mode .sortable-row{border:1px dashed rgba(56,189,248,0.35) !important;
   <div class="hdr-inner">
     <div class="hdr-row">
       <div>
-        <div class="eyebrow">Personal Health Dashboard &middot; Confidential &middot; June 2026</div>
+        <div class="eyebrow">Personal Health Dashboard &middot; Confidential &middot; <span id="hdr-date">June 2026</span></div>
         <div class="hdr-name">Baden Appleyard</div>
-        <div class="hdr-sub">Male &middot; Age 55 &middot; 185 cm &middot; 92 kg &middot; Carindale QLD &middot; Non-smoker &middot; Non-drinker</div>
+        <div class="hdr-sub">Male &middot; Age <span id="hdr-age">55</span> &middot; 185 cm &middot; <span id="hdr-weight">92</span> kg &middot; Carindale QLD &middot; Non-smoker &middot; Non-drinker</div>
       </div>
       <div class="hdr-right">
         <button class="theme-btn" onclick="toggleTheme()" id="theme-btn">&#9790; Light Mode</button>
@@ -388,123 +394,120 @@ body.edit-mode .sortable-row{border:1px dashed rgba(56,189,248,0.35) !important;
   <!-- Sortable rows container -->
   <div id="health-sortable">
 
-    <!-- ROW: Steps + HR -->
-    <div class="g2 sortable-row" data-id="row-steps-hr">
-      <div class="cc">
-        <div class="period-row">
-          <div style="display:flex;align-items:center;gap:8px">
-            <div class="sort-handle" title="Drag to reorder">&#8801;</div>
-            <div><div class="ct">Daily Steps</div><div class="cs">Target 10,000/day</div></div>
-          </div>
-          <div class="period-btns">
-            <button class="pbtn" onclick="setPeriod('steps',7,this)">7D</button>
-            <button class="pbtn active" onclick="setPeriod('steps',30,this)">30D</button>
-            <button class="pbtn" onclick="setPeriod('steps',90,this)">90D</button>
-          </div>
-        </div>
-        <div class="form-section"><div class="fst">+ Log manually</div>
-          <div class="form-row">
-            <div class="fg"><div class="flbl">Date</div><input class="finp" type="date" id="f-steps-date"></div>
-            <div class="fg"><div class="flbl">Steps</div><input class="finp" type="number" id="f-steps-val" placeholder="8500"></div>
-            <button class="fbtn" onclick="addFit('steps')">Add</button>
-          </div>
-        </div>
-        <div class="cw"><canvas id="c-steps"></canvas></div>
+    <!-- ITEM: Steps + HR -->
+    <div class="sortable-item" data-id="row-steps-hr">
+      <div class="edit-bar">
+        <span class="drag-icon">&#8942;</span>
+        <span class="edit-bar-label">&#8801; Steps &amp; Heart Rate &mdash; drag here to reorder</span>
+        <button class="hide-row-btn" onclick="toggleRowHide(this)">&#128065; Hide</button>
       </div>
-      <div class="cc">
-        <div class="period-row">
-          <div style="display:flex;align-items:center;gap:8px">
-            <div class="sort-handle" title="Drag to reorder">&#8801;</div>
-            <div><div class="ct">Resting Heart Rate</div><div class="cs">Healthy for active 55yo: 55&ndash;75 bpm</div></div>
+      <div class="g2">
+        <div class="cc">
+          <div class="period-row">
+            <div><div class="ct">Daily Steps</div><div class="cs">Target 10,000/day</div></div>
+            <div class="period-btns">
+              <button class="pbtn" onclick="setPeriod('steps',7,this)">7D</button>
+              <button class="pbtn active" onclick="setPeriod('steps',30,this)">30D</button>
+              <button class="pbtn" onclick="setPeriod('steps',90,this)">90D</button>
+            </div>
           </div>
-        </div>
-        <div class="form-section"><div class="fst">+ Log manually</div>
-          <div class="form-row">
-            <div class="fg"><div class="flbl">Date</div><input class="finp" type="date" id="f-hr-date"></div>
-            <div class="fg"><div class="flbl">BPM</div><input class="finp" type="number" id="f-hr-val" placeholder="62"></div>
-            <button class="fbtn" onclick="addFit('hr')">Add</button>
+          <div class="form-section"><div class="fst">+ Log manually</div>
+            <div class="form-row">
+              <div class="fg"><div class="flbl">Date</div><input class="finp" type="date" id="f-steps-date"></div>
+              <div class="fg"><div class="flbl">Steps</div><input class="finp" type="number" id="f-steps-val" placeholder="8500"></div>
+              <button class="fbtn" onclick="addFit('steps')">Add</button>
+            </div>
           </div>
+          <div class="cw"><canvas id="c-steps"></canvas></div>
         </div>
-        <div class="cw"><canvas id="c-hr"></canvas></div>
+        <div class="cc">
+          <div class="period-row"><div><div class="ct">Resting Heart Rate</div><div class="cs">Healthy for active 55yo: 55&ndash;75 bpm</div></div></div>
+          <div class="form-section"><div class="fst">+ Log manually</div>
+            <div class="form-row">
+              <div class="fg"><div class="flbl">Date</div><input class="finp" type="date" id="f-hr-date"></div>
+              <div class="fg"><div class="flbl">BPM</div><input class="finp" type="number" id="f-hr-val" placeholder="62"></div>
+              <button class="fbtn" onclick="addFit('hr')">Add</button>
+            </div>
+          </div>
+          <div class="cw"><canvas id="c-hr"></canvas></div>
+        </div>
       </div>
     </div>
 
-    <!-- ROW: Blood Pressure + Sleep -->
-    <div class="g2 sortable-row" data-id="row-bp-sleep">
-      <div class="cc">
-        <div class="period-row">
-          <div style="display:flex;align-items:center;gap:8px">
-            <div class="sort-handle" title="Drag to reorder">&#8801;</div>
+    <!-- ITEM: Blood Pressure + Sleep -->
+    <div class="sortable-item" data-id="row-bp-sleep">
+      <div class="edit-bar">
+        <span class="drag-icon">&#8942;</span>
+        <span class="edit-bar-label">&#8801; Blood Pressure &amp; Sleep &mdash; drag here to reorder</span>
+        <button class="hide-row-btn" onclick="toggleRowHide(this)">&#128065; Hide</button>
+      </div>
+      <div class="g2">
+        <div class="cc">
+          <div class="period-row">
             <div>
               <div class="ct">Blood Pressure</div>
               <div class="cs">Target: systolic &lt;130 &middot; diastolic &lt;80</div>
             </div>
-          </div>
-          <div style="display:flex;align-items:center;gap:10px">
-            <div class="cls"><div class="cli"><div class="cld" style="background:#F87171"></div>Sys</div><div class="cli"><div class="cld" style="background:#38BDF8"></div>Dia</div><div class="cli"><div class="cld" style="background:#FBBF24"></div>Pulse</div></div>
-            <div class="period-btns">
-              <button class="pbtn" onclick="setBPPeriod(7,this)">7D</button>
-              <button class="pbtn active" onclick="setBPPeriod(30,this)">30D</button>
-              <button class="pbtn" onclick="setBPPeriod(90,this)">90D</button>
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="cls"><div class="cli"><div class="cld" style="background:#F87171"></div>Sys</div><div class="cli"><div class="cld" style="background:#38BDF8"></div>Dia</div><div class="cli"><div class="cld" style="background:#FBBF24"></div>Pulse</div></div>
+              <div class="period-btns">
+                <button class="pbtn" onclick="setBPPeriod(7,this)">7D</button>
+                <button class="pbtn active" onclick="setBPPeriod(30,this)">30D</button>
+                <button class="pbtn" onclick="setBPPeriod(90,this)">90D</button>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="form-section"><div class="fst">+ Log reading (Google Fit BP auto-syncs; pulse from manual entry only)</div>
-          <div class="form-row">
-            <div class="fg"><div class="flbl">Date</div><input class="finp" type="date" id="f-bp-date"></div>
-            <div class="fg"><div class="flbl">Systolic</div><input class="finp" type="number" id="f-bp-sys" placeholder="118" style="min-width:70px"></div>
-            <div class="fg"><div class="flbl">Diastolic</div><input class="finp" type="number" id="f-bp-dia" placeholder="76" style="min-width:70px"></div>
-            <div class="fg"><div class="flbl">Pulse</div><input class="finp" type="number" id="f-bp-pulse" placeholder="65" style="min-width:60px"></div>
-            <button class="fbtn" onclick="addBP()">Add</button>
+          <div class="form-section"><div class="fst">+ Log reading (pulse from manual entry only &mdash; not provided by Google Fit)</div>
+            <div class="form-row">
+              <div class="fg"><div class="flbl">Date</div><input class="finp" type="date" id="f-bp-date"></div>
+              <div class="fg"><div class="flbl">Systolic</div><input class="finp" type="number" id="f-bp-sys" placeholder="118" style="min-width:70px"></div>
+              <div class="fg"><div class="flbl">Diastolic</div><input class="finp" type="number" id="f-bp-dia" placeholder="76" style="min-width:70px"></div>
+              <div class="fg"><div class="flbl">Pulse</div><input class="finp" type="number" id="f-bp-pulse" placeholder="65" style="min-width:60px"></div>
+              <button class="fbtn" onclick="addBP()">Add</button>
+            </div>
           </div>
+          <div class="cw"><canvas id="c-bp"></canvas></div>
         </div>
-        <div class="cw"><canvas id="c-bp"></canvas></div>
-      </div>
-      <div class="cc">
-        <div class="period-row">
-          <div style="display:flex;align-items:center;gap:8px">
-            <div class="sort-handle" title="Drag to reorder">&#8801;</div>
-            <div><div class="ct">Sleep Duration</div><div class="cs">Target 7&ndash;8 hours &middot; Manual entry or wearable via Google Fit</div></div>
+        <div class="cc">
+          <div class="period-row"><div><div class="ct">Sleep Duration</div><div class="cs">Target 7&ndash;8 hours &middot; Manual entry or wearable via Google Fit</div></div></div>
+          <div class="form-section"><div class="fst">+ Log manually</div>
+            <div class="form-row">
+              <div class="fg"><div class="flbl">Date</div><input class="finp" type="date" id="f-sleep-date"></div>
+              <div class="fg"><div class="flbl">Hours</div><input class="finp" type="number" id="f-sleep-val" placeholder="7.5" step="0.5"></div>
+              <button class="fbtn" onclick="addFit('sleep')">Add</button>
+            </div>
           </div>
+          <div class="cw"><canvas id="c-sleep"></canvas></div>
         </div>
-        <div class="form-section"><div class="fst">+ Log manually</div>
-          <div class="form-row">
-            <div class="fg"><div class="flbl">Date</div><input class="finp" type="date" id="f-sleep-date"></div>
-            <div class="fg"><div class="flbl">Hours</div><input class="finp" type="number" id="f-sleep-val" placeholder="7.5" step="0.5"></div>
-            <button class="fbtn" onclick="addFit('sleep')">Add</button>
-          </div>
-        </div>
-        <div class="cw"><canvas id="c-sleep"></canvas></div>
       </div>
     </div>
 
-    <!-- ROW: Weight + SpO2 -->
-    <div class="g2 sortable-row" data-id="row-wt-spo2">
-      <div class="cc">
-        <div class="period-row">
-          <div style="display:flex;align-items:center;gap:8px">
-            <div class="sort-handle" title="Drag to reorder">&#8801;</div>
-            <div><div class="ct">Body Weight</div><div class="cs">From Google Fit &middot; BMI calculated at 185 cm</div></div>
-          </div>
-          <div class="cls"><div class="cli"><div class="cld" style="background:#38BDF8"></div>kg</div><div class="cli"><div class="cld" style="background:#FBBF24"></div>BMI</div></div>
-        </div>
-        <div class="form-section"><div class="fst">+ Log manually</div>
-          <div class="form-row">
-            <div class="fg"><div class="flbl">Date</div><input class="finp" type="date" id="f-wt-date"></div>
-            <div class="fg"><div class="flbl">Weight (kg)</div><input class="finp" type="number" id="f-wt-val" placeholder="91.5" step="0.1"></div>
-            <button class="fbtn" onclick="addWt()">Add</button>
-          </div>
-        </div>
-        <div class="cw-t"><canvas id="c-weight"></canvas></div>
+    <!-- ITEM: Weight + SpO2 -->
+    <div class="sortable-item" data-id="row-wt-spo2">
+      <div class="edit-bar">
+        <span class="drag-icon">&#8942;</span>
+        <span class="edit-bar-label">&#8801; Weight &amp; Blood Oxygen &mdash; drag here to reorder</span>
+        <button class="hide-row-btn" onclick="toggleRowHide(this)">&#128065; Hide</button>
       </div>
-      <div class="cc">
-        <div class="period-row">
-          <div style="display:flex;align-items:center;gap:8px">
-            <div class="sort-handle" title="Drag to reorder">&#8801;</div>
-            <div><div class="ct">Blood Oxygen (SpO&#8322;)</div><div class="cs">Normal: 95&ndash;100% &middot; Below 95% warrants attention</div></div>
+      <div class="g2">
+        <div class="cc">
+          <div class="period-row">
+            <div><div class="ct">Body Weight</div><div class="cs">From Google Fit &middot; BMI calculated at 185 cm</div></div>
+            <div class="cls"><div class="cli"><div class="cld" style="background:#38BDF8"></div>kg</div><div class="cli"><div class="cld" style="background:#FBBF24"></div>BMI</div></div>
           </div>
+          <div class="form-section"><div class="fst">+ Log manually</div>
+            <div class="form-row">
+              <div class="fg"><div class="flbl">Date</div><input class="finp" type="date" id="f-wt-date"></div>
+              <div class="fg"><div class="flbl">Weight (kg)</div><input class="finp" type="number" id="f-wt-val" placeholder="91.5" step="0.1"></div>
+              <button class="fbtn" onclick="addWt()">Add</button>
+            </div>
+          </div>
+          <div class="cw-t"><canvas id="c-weight"></canvas></div>
         </div>
-        <div class="cw"><canvas id="c-spo2"></canvas></div>
+        <div class="cc">
+          <div class="period-row"><div><div class="ct">Blood Oxygen (SpO&#8322;)</div><div class="cs">Normal: 95&ndash;100% &middot; Below 95% warrants attention</div></div></div>
+          <div class="cw"><canvas id="c-spo2"></canvas></div>
+        </div>
       </div>
     </div>
 
@@ -820,27 +823,49 @@ function initFitness() {
   if (spo2All.length) updStat('spo2',spo2All[spo2All.length-1].v+'%');
   renderRem();
   document.getElementById('rem-date').textContent=new Date().toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'});
-  // Init drag-to-reorder
+  // ── DRAG-TO-REORDER INIT ──
   try {
-    if (window.Sortable) {
-      const container = document.getElementById('health-sortable');
-      // Restore saved row order
-      const savedOrder = store.get('row_order', null);
-      if (savedOrder && Array.isArray(savedOrder)) {
-        savedOrder.forEach(id => {
-          const el = container.querySelector('[data-id="'+id+'"]');
-          if (el) container.appendChild(el);
-        });
+    const container = document.getElementById('health-sortable');
+    if (!container) { console.warn('health-sortable not found'); return; }
+
+    // Restore saved hidden rows
+    const hiddenRows = store.get('hidden_rows', []);
+    hiddenRows.forEach(id => {
+      const item = container.querySelector('[data-id="'+id+'"]');
+      if (item) {
+        item.classList.add('row-hidden');
+        const btn = item.querySelector('.hide-row-btn');
+        if (btn) { btn.innerHTML = '\u{1F441} Show'; btn.classList.add('row-is-hidden'); }
       }
+    });
+
+    // Restore saved row order
+    const savedOrder = store.get('row_order', null);
+    if (savedOrder && Array.isArray(savedOrder)) {
+      savedOrder.forEach(id => {
+        const el = container.querySelector('[data-id="'+id+'"]');
+        if (el) container.appendChild(el);
+      });
+    }
+
+    // Init Sortable
+    if (typeof Sortable !== 'undefined') {
       Sortable.create(container, {
-        animation: 150,
-        handle: '.sort-handle',
+        animation: 200,
+        handle: '.edit-bar',
         ghostClass: 'sort-ghost',
+        dragClass: 'sort-drag',
+        forceFallback: false,
+        onStart: () => { document.body.style.cursor = 'grabbing'; },
         onEnd: () => {
-          const order = Array.from(container.querySelectorAll('.sortable-row')).map(r=>r.dataset.id);
+          document.body.style.cursor = '';
+          const order = Array.from(container.querySelectorAll('.sortable-item')).map(r=>r.dataset.id);
           store.set('row_order', order);
         }
       });
+      console.log('Sortable initialized — enter Edit Layout to drag rows');
+    } else {
+      console.warn('SortableJS not loaded — install from CDN failed');
     }
   } catch(e) { console.error('Sortable init error:', e); }
 }
@@ -848,7 +873,25 @@ function initFitness() {
 function toggleEditLayout() {
   const editing = document.body.classList.toggle('edit-mode');
   const btn = document.getElementById('edit-layout-btn');
-  if (btn) btn.textContent = editing ? '&#10003; Done Editing' : '&#8285; Edit Layout';
+  if (btn) {
+    btn.innerHTML = editing ? '&#10003; Done Editing' : '&#8285; Edit Layout';
+    btn.classList.toggle('is-editing', editing);
+  }
+}
+
+function toggleRowHide(btn) {
+  try {
+    const item = btn.closest('.sortable-item');
+    const id   = item.dataset.id;
+    const isNowHidden = item.classList.toggle('row-hidden');
+    btn.innerHTML = isNowHidden ? '&#128065; Show' : '&#128065; Hide';
+    btn.classList.toggle('row-is-hidden', isNowHidden);
+    // Persist
+    let hidden = store.get('hidden_rows', []);
+    if (isNowHidden) { if (!hidden.includes(id)) hidden.push(id); }
+    else { hidden = hidden.filter(x => x !== id); }
+    store.set('hidden_rows', hidden);
+  } catch(e) { console.error('toggleRowHide error:', e); }
 }
 
 function updStat(k, v) {
@@ -1063,7 +1106,7 @@ async function syncGFit() {
       method:'POST',headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
       body:JSON.stringify({aggregateBy:[{dataTypeName:'com.google.weight'}],bucketByTime:{durationMillis:86400000},startTimeMillis:d30,endTimeMillis:now})
     });
-    if(wtRes.ok){const wd=await wtRes.json();const wtData=wd.bucket.map(b=>{const pts=b.dataset[0]?.point||[];if(!pts.length)return null;const kg=Math.round(pts[0].value?.[0]?.fpVal*10)/10;if(!kg)return null;const bmi=Math.round((kg/3.4225)*10)/10;const ts=new Date(parseInt(b.startTimeMillis)).toISOString().split('T')[0];return{date:new Date(parseInt(b.startTimeMillis)).toLocaleDateString('en-AU',{day:'numeric',month:'short'}),kg,bmi,ts};}).filter(d=>d&&d.kg>30&&d.kg<300);if(wtData.length){store.set('fit_wt',wtData);if(window._ft&&wtC){wtC.data.labels=wtData.map(d=>d.date);wtC.data.datasets[0].data=wtData.map(d=>d.kg);wtC.data.datasets[1].data=wtData.map(d=>d.bmi);wtC.update();}}}
+    if(wtRes.ok){const wd=await wtRes.json();const wtData=wd.bucket.map(b=>{const pts=b.dataset[0]?.point||[];if(!pts.length)return null;const kg=Math.round(pts[0].value?.[0]?.fpVal*10)/10;if(!kg)return null;const bmi=Math.round((kg/3.4225)*10)/10;const ts=new Date(parseInt(b.startTimeMillis)).toISOString().split('T')[0];return{date:new Date(parseInt(b.startTimeMillis)).toLocaleDateString('en-AU',{day:'numeric',month:'short'}),kg,bmi,ts};}).filter(d=>d&&d.kg>30&&d.kg<300);if(wtData.length){store.set('fit_wt',wtData);if(window._ft&&wtC){wtC.data.labels=wtData.map(d=>d.date);wtC.data.datasets[0].data=wtData.map(d=>d.kg);wtC.data.datasets[1].data=wtData.map(d=>d.bmi);wtC.update();} updateDynamicHeader();}}
 
     // ── BLOOD PRESSURE — discover sources first, then read directly ──
     try {
@@ -1273,7 +1316,31 @@ function resetRem() {
 // ══════════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════════
+function updateDynamicHeader() {
+  // Dynamic date
+  const el_date = document.getElementById('hdr-date');
+  if (el_date) el_date.textContent = new Date().toLocaleDateString('en-AU',{month:'long',year:'numeric'});
+  // Dynamic age from DOB 03/03/1971
+  const el_age = document.getElementById('hdr-age');
+  if (el_age) {
+    const dob = new Date(1971,2,3);
+    const now = new Date();
+    let age = now.getFullYear()-dob.getFullYear();
+    const mDiff = now.getMonth()-dob.getMonth();
+    if (mDiff<0||(mDiff===0&&now.getDate()<dob.getDate())) age--;
+    el_age.textContent = age;
+  }
+  // Dynamic weight from most recent stored reading
+  const el_wt = document.getElementById('hdr-weight');
+  if (el_wt) {
+    const wtData = store.get('fit_wt',[]);
+    if (wtData.length) el_wt.textContent = wtData[wtData.length-1].kg;
+  }
+}
+
 function initApp() {
+  // Update dynamic header values
+  updateDynamicHeader();
   // Restore theme
   const th = store.get('theme','dark');
   if (th === 'light') toggleTheme();
