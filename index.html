@@ -505,7 +505,21 @@ body.edit-mode .sortable-item{border:1px dashed rgba(56,189,248,0.25);border-rad
           <div class="cw-t"><canvas id="c-weight"></canvas></div>
         </div>
         <div class="cc">
-          <div class="period-row"><div><div class="ct">Blood Oxygen (SpO&#8322;)</div><div class="cs">Normal: 95&ndash;100% &middot; Below 95% warrants attention</div></div></div>
+          <div class="period-row">
+            <div><div class="ct">Blood Oxygen (SpO&#8322;)</div><div class="cs">Normal: 95&ndash;100% &middot; Below 95% warrants attention</div></div>
+            <div class="period-btns">
+              <button class="pbtn" onclick="setSpo2Period(7,this)">7D</button>
+              <button class="pbtn active" onclick="setSpo2Period(30,this)">30D</button>
+              <button class="pbtn" onclick="setSpo2Period(90,this)">90D</button>
+            </div>
+          </div>
+          <div class="form-section"><div class="fst">+ Log manually</div>
+            <div class="form-row">
+              <div class="fg"><div class="flbl">Date</div><input class="finp" type="date" id="f-spo2-date"></div>
+              <div class="fg"><div class="flbl">SpO&#8322; %</div><input class="finp" type="number" id="f-spo2-val" placeholder="98" min="50" max="100" step="0.1"></div>
+              <button class="fbtn" onclick="addSpo2()">Add</button>
+            </div>
+          </div>
           <div class="cw"><canvas id="c-spo2"></canvas></div>
         </div>
       </div>
@@ -620,11 +634,39 @@ body.edit-mode .sortable-item{border:1px dashed rgba(56,189,248,0.25);border-rad
 // ══════════════════════════════════════════════
 // STORAGE — localStorage + in-memory fallback
 // ══════════════════════════════════════════════
-const store = {
-  _m:{},
-  get(k,d){ try{ const v=localStorage.getItem('hd_'+k); return v!==null?JSON.parse(v):(this._m[k]!==undefined?this._m[k]:(d!==undefined?d:null)); }catch{return this._m[k]!==undefined?this._m[k]:(d!==undefined?d:null);} },
-  set(k,v){ this._m[k]=v; try{localStorage.setItem('hd_'+k,JSON.stringify(v));}catch{} }
-};
+const store = (() => {
+  // Test localStorage immediately — fail fast, no silent swallowing
+  let _lsOk = false;
+  try {
+    const _t = '__hd_test__';
+    localStorage.setItem(_t, '1');
+    _lsOk = localStorage.getItem(_t) === '1';
+    localStorage.removeItem(_t);
+  } catch(e) { _lsOk = false; }
+  const _m = {};
+  return {
+    isOk: () => _lsOk,
+    get(k, def) {
+      if (_lsOk) {
+        try {
+          const raw = localStorage.getItem('hd_' + k);
+          if (raw !== null) return JSON.parse(raw);
+        } catch(e) { console.warn('store.get parse error', k, e); }
+      }
+      return k in _m ? _m[k] : (def !== undefined ? def : null);
+    },
+    set(k, v) {
+      _m[k] = v;
+      if (_lsOk) {
+        try { localStorage.setItem('hd_' + k, JSON.stringify(v)); }
+        catch(e) {
+          console.error('store.set failed for', k, e);
+          _lsOk = false; // stop trying if quota exceeded etc.
+        }
+      }
+    }
+  };
+})();
 
 // ══════════════════════════════════════════════
 // PASSWORD AUTH
@@ -791,7 +833,7 @@ function setPeriod(key, days, btn) {
 
 function initFitness() {
   const t = new Date().toISOString().split('T')[0];
-  ['steps','hr','sleep','bp','wt'].forEach(k=>{const el=document.getElementById('f-'+k+'-date');if(el)el.value=t;});
+  ['steps','hr','sleep','bp','wt','spo2'].forEach(k=>{const el=document.getElementById('f-'+k+'-date');if(el)el.value=t;});
   fKeys.forEach(k => {
     try {
       const cfg  = fCfg[k];
@@ -905,6 +947,48 @@ function updBPStat(sys, dia, pulse) {
   if (!el) return;
   el.textContent = pulse ? sys+'/'+dia+'/'+pulse : sys+'/'+dia;
   el.title = 'Systolic: '+sys+' / Diastolic: '+dia + (pulse?' / Pulse: '+pulse:'');
+}
+
+function addSpo2() {
+  try {
+    const dateEl = document.getElementById('f-spo2-date');
+    const valEl  = document.getElementById('f-spo2-val');
+    if (!dateEl||!valEl) return;
+    const date = dateEl.value;
+    const val  = parseFloat(valEl.value);
+    if (!date) { alert('Please select a date'); return; }
+    if (isNaN(val)||val<50||val>100) { alert('Please enter a valid SpO\u2082 value (50\u2013100%)'); return; }
+    const dispDate = new Date(date+'T12:00:00').toLocaleDateString('en-AU',{day:'numeric',month:'short'});
+    let all = store.get('fit_spo2',[]);
+    all = all.filter(d=>d.ts!==date);
+    all.push({date:dispDate, ts:date, v:val});
+    all.sort((a,b)=>a.ts.localeCompare(b.ts));
+    store.set('fit_spo2', all);
+    const days = chartPeriods['spo2']||30;
+    const f = filterDays(all, days);
+    if (fC.spo2) {
+      fC.spo2.data.labels = f.map(d=>d.date);
+      fC.spo2.data.datasets[0].data = f.map(d=>d.v);
+      if (fC.spo2.data.datasets[1]) fC.spo2.data.datasets[1].data = Array(Math.max(f.length,2)).fill(95);
+      fC.spo2.update();
+    }
+    updStat('spo2', val+'%');
+    valEl.value = '';
+    console.log('SpO2 saved:', val, '% | Storage ok:', store.isOk());
+  } catch(e) { console.error('addSpo2 error:', e); }
+}
+
+function setSpo2Period(days, btn) {
+  btn.parentElement.querySelectorAll('.pbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  chartPeriods['spo2'] = days;
+  const all = store.get('fit_spo2',[]);
+  const f = filterDays(all, days);
+  if (!fC.spo2) return;
+  fC.spo2.data.labels = f.map(d=>d.date);
+  fC.spo2.data.datasets[0].data = f.map(d=>d.v);
+  if (fC.spo2.data.datasets[1]) fC.spo2.data.datasets[1].data = Array(Math.max(f.length,2)).fill(95);
+  fC.spo2.update();
 }
 
 function addFit(k) {
@@ -1265,17 +1349,34 @@ function renderBPT(data) {
 }
 
 function addWt() {
-  const date=document.getElementById('f-wt-date').value;
-  const kg=parseFloat(document.getElementById('f-wt-val').value);
-  if(!date||isNaN(kg)) return;
-  const bmi=Math.round((kg/3.4225)*10)/10;
-  const dispDate=new Date(date).toLocaleDateString('en-AU',{day:'numeric',month:'short'});
-  const data=store.get('fit_wt',[]);
-  data.push({date:dispDate,kg,bmi,ts:date});
-  data.sort((a,b)=>a.ts.localeCompare(b.ts));
-  store.set('fit_wt',data);
-  if (wtC) { wtC.data.labels=data.map(d=>d.date); wtC.data.datasets[0].data=data.map(d=>d.kg); wtC.data.datasets[1].data=data.map(d=>d.bmi); wtC.update(); }
-  document.getElementById('f-wt-val').value='';
+  try {
+    const dateEl = document.getElementById('f-wt-date');
+    const valEl  = document.getElementById('f-wt-val');
+    if (!dateEl||!valEl) return;
+    const date = dateEl.value;
+    const kg   = parseFloat(valEl.value);
+    if (!date) { alert('Please select a date'); return; }
+    if (isNaN(kg)||kg<20||kg>300) { alert('Please enter a valid weight (20-300 kg)'); return; }
+    const bmi      = Math.round((kg/3.4225)*10)/10; // 1.85^2 = 3.4225
+    const dispDate = new Date(date+'T12:00:00').toLocaleDateString('en-AU',{day:'numeric',month:'short'});
+    let data = store.get('fit_wt',[]);
+    // Replace same-day entry rather than duplicating
+    data = data.filter(d=>d.ts!==date);
+    data.push({date:dispDate, kg, bmi, ts:date});
+    data.sort((a,b)=>a.ts.localeCompare(b.ts));
+    store.set('fit_wt', data);
+    // Update chart
+    if (wtC) {
+      wtC.data.labels = data.map(d=>d.date);
+      wtC.data.datasets[0].data = data.map(d=>d.kg);
+      wtC.data.datasets[1].data = data.map(d=>d.bmi);
+      wtC.update();
+    }
+    valEl.value = '';
+    // Update the weight in the page header
+    updateDynamicHeader();
+    console.log('Weight saved:', kg, 'kg | BMI:', bmi, '| Storage ok:', store.isOk());
+  } catch(e) { console.error('addWt error:', e); }
 }
 
 // ══════════════════════════════════════════════
@@ -1334,13 +1435,25 @@ function updateDynamicHeader() {
   const el_wt = document.getElementById('hdr-weight');
   if (el_wt) {
     const wtData = store.get('fit_wt',[]);
-    if (wtData.length) el_wt.textContent = wtData[wtData.length-1].kg;
+    if (wtData.length) {
+      const last = wtData[wtData.length-1];
+      el_wt.textContent = last.kg;
+    }
   }
 }
 
 function initApp() {
   // Update dynamic header values
   updateDynamicHeader();
+  // Warn if localStorage is unavailable (data won't persist)
+  if (!store.isOk()) {
+    const w = document.createElement('div');
+    w.style.cssText = 'position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:#DC2626;color:#fff;padding:10px 18px;border-radius:10px;font-size:12px;z-index:9998;box-shadow:0 4px 20px rgba(0,0,0,0.5);max-width:90vw;text-align:center';
+    w.innerHTML = '\u26A0\uFE0F Data storage is <strong>blocked</strong> on this browser. Open in a regular (non-private) window or check browser settings to enable data persistence.';
+    document.body.appendChild(w);
+    setTimeout(() => w.style.opacity='0', 6000);
+    setTimeout(() => w.remove(), 6500);
+  }
   // Restore theme
   const th = store.get('theme','dark');
   if (th === 'light') toggleTheme();
