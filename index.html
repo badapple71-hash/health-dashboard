@@ -178,6 +178,17 @@ body{background:var(--bg);color:var(--tp);font-family:-apple-system,'Segoe UI',I
 .lcard{background:var(--s1);border-radius:var(--rs);padding:10px 12px;border:1px solid}
 .lcard.g{border-color:rgba(52,211,153,0.3)}.lcard.w{border-color:rgba(251,191,36,0.3)}
 .lcard-t{font-size:11px;font-weight:700}.lcard-s{font-size:10px;color:var(--tm);margin-top:2px}
+
+/* ── PERIOD SELECTOR ── */
+.period-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.period-btns{display:flex;gap:4px}
+.pbtn{padding:3px 10px;font-size:10px;font-weight:700;border:1px solid var(--border);background:var(--s2);color:var(--tm);border-radius:6px;cursor:pointer;transition:all .15s}
+.pbtn:hover{border-color:var(--accent);color:var(--accent)}
+.pbtn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+/* ── STAT BUBBLE EXTRAS ── */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.stat-wide{grid-column:span 2}
+
 /* ── SCROLLBAR ── */
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-track{background:var(--bg)}
@@ -240,8 +251,7 @@ body{background:var(--bg);color:var(--tp);font-family:-apple-system,'Segoe UI',I
     <button class="ntab" onclick="showTab('cardiac',this)">&#129756; Cardiac</button>
     <button class="ntab" onclick="showTab('labs',this)">&#128202; Lab Trends</button>
     <button class="ntab" onclick="showTab('supplements',this)">&#128138; Supplements</button>
-    <button class="ntab" onclick="showTab('fitness',this)">&#127939; Fitness</button>
-    <button class="ntab" onclick="showTab('trackers',this)">&#128203; Trackers</button>
+    <button class="ntab" onclick="showTab('fitness',this)">&#127939; Health &amp; Activity</button>
     <button class="ntab" onclick="showTab('history',this)">&#128221; History</button>
     <button class="ntab" onclick="showTab('team',this)">&#128101; Team &amp; Actions</button>
   </div>
@@ -336,54 +346,161 @@ body{background:var(--bg);color:var(--tp);font-family:-apple-system,'Segoe UI',I
   </div>
 </div>
 
-<!-- FITNESS -->
+<!-- HEALTH & ACTIVITY -->
 <div id="tp-fitness" class="tp-p">
-  <!-- Google Fit connection bar -->
+
+  <!-- Google Fit bar -->
   <div class="gfit-bar">
     <div>
       <div class="gfit-title">&#127939; Google Fit</div>
-      <div class="gfit-sub" id="gfit-sub-text">Connect to pull your steps, heart rate and sleep automatically.</div>
+      <div class="gfit-sub" id="gfit-sub-text">Connect to sync steps, heart rate, sleep, blood pressure, weight, SpO&#8322; and more.</div>
     </div>
-    <div id="gfit-btn-wrap">
-      <button class="gfit-connect-btn" onclick="connectGFit()">
-        <svg viewBox="0 0 24 24" style="width:18px;height:18px" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-        Connect Google Fit
-      </button>
-    </div>
+    <div id="gfit-btn-wrap"></div>
   </div>
-  <div class="g4" style="margin-bottom:14px">
-    <div class="fit-stat"><div class="fsv" id="stat-steps">&mdash;</div><div class="fsl">Steps (latest)</div><div class="fss">Target: 10,000</div></div>
+
+  <!-- Stat bubbles -->
+  <div class="stat-grid">
+    <div class="fit-stat"><div class="fsv" id="stat-steps">&mdash;</div><div class="fsl">Steps (latest)</div><div class="fss">Target 10,000</div></div>
     <div class="fit-stat"><div class="fsv" id="stat-hr">&mdash;</div><div class="fsl">Resting HR</div><div class="fss">bpm</div></div>
     <div class="fit-stat"><div class="fsv" id="stat-sleep">&mdash;</div><div class="fsl">Sleep (latest)</div><div class="fss">hours</div></div>
-    <div class="fit-stat"><div class="fsv" id="stat-vo2">&mdash;</div><div class="fsl">VO&#8322; Max</div><div class="fss">mL/kg/min</div></div>
+    <div class="fit-stat"><div class="fsv" id="stat-bp" style="font-size:18px">&mdash;</div><div class="fsl">Blood Pressure</div><div class="fss">mmHg (latest)</div></div>
+    <div class="fit-stat"><div class="fsv" id="stat-spo2">&mdash;</div><div class="fsl">SpO&#8322; (Blood O&#8322;)</div><div class="fss">%</div></div>
+    <div class="fit-stat"><div class="fsv" id="stat-resp">&mdash;</div><div class="fsl">Respiratory Rate</div><div class="fss">breaths/min</div></div>
+    <div class="fit-stat"><div class="fsv" id="stat-actmin">&mdash;</div><div class="fsl">Active Minutes</div><div class="fss">today</div></div>
+    <div class="fit-stat"><div class="fsv" id="stat-cal">&mdash;</div><div class="fsl">Calories Burned</div><div class="fss">kcal today</div></div>
   </div>
-  <div class="g2">
-    <div class="cc"><div class="ch"><div><div class="ct">Daily Steps</div><div class="cs">Target 10,000/day &middot; Auto-populated from Google Fit when connected</div></div></div><div class="form-section"><div class="fst">+ Log manually</div><div class="form-row"><div class="fg"><div class="flbl">Date</div><input class="finp" type="date" id="f-steps-date"></div><div class="fg"><div class="flbl">Steps</div><input class="finp" type="number" id="f-steps-val" placeholder="8500"></div><button class="fbtn" onclick="addFit('steps')">Add</button></div></div><div class="cw"><canvas id="c-steps"></canvas></div></div>
-    <div class="cc"><div class="ch"><div><div class="ct">Resting Heart Rate</div><div class="cs">Healthy range for active 55yo: 55&ndash;75 bpm</div></div></div><div class="form-section"><div class="fst">+ Log manually</div><div class="form-row"><div class="fg"><div class="flbl">Date</div><input class="finp" type="date" id="f-hr-date"></div><div class="fg"><div class="flbl">BPM</div><input class="finp" type="number" id="f-hr-val" placeholder="62"></div><button class="fbtn" onclick="addFit('hr')">Add</button></div></div><div class="cw"><canvas id="c-hr"></canvas></div></div>
-  </div>
-  <div class="g2">
-    <div class="cc"><div class="ch"><div><div class="ct">Sleep Duration</div><div class="cs">Target 7&ndash;8 hours nightly</div></div></div><div class="form-section"><div class="fst">+ Log manually</div><div class="form-row"><div class="fg"><div class="flbl">Date</div><input class="finp" type="date" id="f-sleep-date"></div><div class="fg"><div class="flbl">Hours</div><input class="finp" type="number" id="f-sleep-val" placeholder="7.5" step="0.5"></div><button class="fbtn" onclick="addFit('sleep')">Add</button></div></div><div class="cw"><canvas id="c-sleep"></canvas></div></div>
-    <div class="cc"><div class="ch"><div><div class="ct">VO&#8322; Max Estimate</div><div class="cs">Average for active 55yo male: 30&ndash;38 mL/kg/min</div></div></div><div class="form-section"><div class="fst">+ Log manually</div><div class="form-row"><div class="fg"><div class="flbl">Date</div><input class="finp" type="date" id="f-vo2-date"></div><div class="fg"><div class="flbl">mL/kg/min</div><input class="finp" type="number" id="f-vo2-val" placeholder="36" step="0.1"></div><button class="fbtn" onclick="addFit('vo2')">Add</button></div></div><div class="cw"><canvas id="c-vo2"></canvas></div></div>
-  </div>
-</div>
 
-<!-- TRACKERS -->
-<div id="tp-trackers" class="tp-p">
-  <div class="st">&#10084; Blood Pressure Log</div>
-  <div class="g2" style="margin-bottom:14px">
-    <div class="cc"><div class="ch"><div><div class="ct">Blood Pressure Trend</div><div class="cs">Target: systolic &lt;130 &middot; diastolic &lt;80</div></div><div class="cls"><div class="cli"><div class="cld" style="background:#F87171"></div>Sys</div><div class="cli"><div class="cld" style="background:#38BDF8"></div>Dia</div></div></div><div class="form-section"><div class="fst">+ Log Reading</div><div class="form-row"><div class="fg"><div class="flbl">Date</div><input class="finp" type="date" id="f-bp-date"></div><div class="fg"><div class="flbl">Systolic</div><input class="finp" type="number" id="f-bp-sys" placeholder="118" style="min-width:70px"></div><div class="fg"><div class="flbl">Diastolic</div><input class="finp" type="number" id="f-bp-dia" placeholder="76" style="min-width:70px"></div><div class="fg"><div class="flbl">Pulse</div><input class="finp" type="number" id="f-bp-pulse" placeholder="65" style="min-width:65px"></div><button class="fbtn" onclick="addBP()">Add</button></div></div><div class="cw-t"><canvas id="c-bp"></canvas></div></div>
-    <div class="card"><div class="ctitle">&#128203; Recent Readings</div><div id="bp-table-wrap"><div class="no-data"><div class="nd-icon">&#10084;</div>No readings yet.</div></div><div style="margin-top:10px;font-size:10px;color:var(--tm);line-height:1.6"><strong style="color:var(--ts)">AHA/ACC:</strong> Normal &lt;120/80 &middot; Elevated 120&ndash;129/&lt;80 &middot; Stage 1: 130&ndash;139/80&ndash;89 &middot; Stage 2: &ge;140/&ge;90</div></div>
-  </div>
-  <div class="st">&#9878; Body Weight &amp; BMI</div>
-  <div class="g2" style="margin-bottom:14px">
-    <div class="cc"><div class="ch"><div><div class="ct">Weight &amp; BMI Trend</div><div class="cs">Height: 185 cm &middot; BMI auto-calculated</div></div><div class="cls"><div class="cli"><div class="cld" style="background:#38BDF8"></div>Weight</div><div class="cli"><div class="cld" style="background:#FBBF24"></div>BMI</div></div></div><div class="form-section"><div class="fst">+ Log Weight</div><div class="form-row"><div class="fg"><div class="flbl">Date</div><input class="finp" type="date" id="f-wt-date"></div><div class="fg"><div class="flbl">Weight (kg)</div><input class="finp" type="number" id="f-wt-val" placeholder="91.5" step="0.1"></div><button class="fbtn" onclick="addWt()">Add</button></div></div><div class="cw-t"><canvas id="c-weight"></canvas></div></div>
-    <div class="card"><div class="ctitle">&#128203; Weight Log</div><div id="wt-table-wrap"><div class="no-data"><div class="nd-icon">&#9878;</div>No entries yet.<br>Current known: ~92 kg &middot; BMI 26.9</div></div><div style="margin-top:10px;font-size:10px;color:var(--tm);line-height:1.6">Normal BMI: 18.5&ndash;24.9 &middot; Overweight: 25&ndash;29.9<br>At 185cm: target &lt;85.6 kg for BMI &lt;25</div></div>
-  </div>
-  <div class="st">&#128138; Daily Reminders</div>
+  <!-- Steps + HR -->
   <div class="g2">
-    <div><div class="card" style="margin-bottom:10px"><div class="ctitle">&#9201; Today &mdash; <span id="rem-date"></span></div><div id="rem-list" style="display:flex;flex-direction:column;gap:7px"></div><div style="font-size:10px;color:var(--tm);text-align:center;margin-top:8px">Resets at midnight &middot; <button onclick="resetRem()" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:10px;text-decoration:underline">Reset</button></div></div></div>
-    <div class="card"><div class="ctitle">&#128172; Timing Guide</div><div style="font-size:11px;color:var(--ts);line-height:1.7;display:flex;flex-direction:column;gap:7px"><div><strong style="color:var(--accent)">Rosuvastatin</strong> &mdash; evening, consistent time</div><div><strong style="color:var(--accent)">NMN</strong> &mdash; morning, fasting or light breakfast</div><div><strong style="color:var(--accent)">Berberine</strong> &mdash; with largest meal</div><div><strong style="color:var(--accent)">Krill Oil</strong> &mdash; with fat-containing meal</div><div><strong style="color:var(--accent)">Creatine (planned)</strong> &mdash; post-workout or any time</div></div></div>
+    <div class="cc">
+      <div class="period-row">
+        <div><div class="ct">Daily Steps</div><div class="cs">Target 10,000/day</div></div>
+        <div class="period-btns">
+          <button class="pbtn" onclick="setPeriod('steps',7,this)">7D</button>
+          <button class="pbtn active" onclick="setPeriod('steps',30,this)">30D</button>
+          <button class="pbtn" onclick="setPeriod('steps',90,this)">90D</button>
+        </div>
+      </div>
+      <div class="form-section"><div class="fst">+ Log manually</div>
+        <div class="form-row">
+          <div class="fg"><div class="flbl">Date</div><input class="finp" type="date" id="f-steps-date"></div>
+          <div class="fg"><div class="flbl">Steps</div><input class="finp" type="number" id="f-steps-val" placeholder="8500"></div>
+          <button class="fbtn" onclick="addFit('steps')">Add</button>
+        </div>
+      </div>
+      <div class="cw"><canvas id="c-steps"></canvas></div>
+    </div>
+    <div class="cc">
+      <div class="period-row"><div><div class="ct">Resting Heart Rate</div><div class="cs">Healthy range active 55yo: 55&ndash;75 bpm</div></div></div>
+      <div class="form-section"><div class="fst">+ Log manually</div>
+        <div class="form-row">
+          <div class="fg"><div class="flbl">Date</div><input class="finp" type="date" id="f-hr-date"></div>
+          <div class="fg"><div class="flbl">BPM</div><input class="finp" type="number" id="f-hr-val" placeholder="62"></div>
+          <button class="fbtn" onclick="addFit('hr')">Add</button>
+        </div>
+      </div>
+      <div class="cw"><canvas id="c-hr"></canvas></div>
+    </div>
   </div>
+
+  <!-- Sleep + Blood Pressure -->
+  <div class="g2">
+    <div class="cc">
+      <div class="period-row"><div><div class="ct">Sleep Duration</div><div class="cs">Target 7&ndash;8 hours nightly</div></div></div>
+      <div class="form-section"><div class="fst">+ Log manually</div>
+        <div class="form-row">
+          <div class="fg"><div class="flbl">Date</div><input class="finp" type="date" id="f-sleep-date"></div>
+          <div class="fg"><div class="flbl">Hours</div><input class="finp" type="number" id="f-sleep-val" placeholder="7.5" step="0.5"></div>
+          <button class="fbtn" onclick="addFit('sleep')">Add</button>
+        </div>
+      </div>
+      <div class="cw"><canvas id="c-sleep"></canvas></div>
+    </div>
+    <div class="cc">
+      <div class="period-row">
+        <div>
+          <div class="ct">Blood Pressure</div>
+          <div class="cs">Target: systolic &lt;130 &middot; diastolic &lt;80</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="cls"><div class="cli"><div class="cld" style="background:#F87171"></div>Sys</div><div class="cli"><div class="cld" style="background:#38BDF8"></div>Dia</div></div>
+          <div class="period-btns">
+            <button class="pbtn" onclick="setBPPeriod(7,this)">7D</button>
+            <button class="pbtn active" onclick="setBPPeriod(30,this)">30D</button>
+            <button class="pbtn" onclick="setBPPeriod(90,this)">90D</button>
+          </div>
+        </div>
+      </div>
+      <div class="form-section"><div class="fst">+ Log reading</div>
+        <div class="form-row">
+          <div class="fg"><div class="flbl">Date</div><input class="finp" type="date" id="f-bp-date"></div>
+          <div class="fg"><div class="flbl">Systolic</div><input class="finp" type="number" id="f-bp-sys" placeholder="118" style="min-width:70px"></div>
+          <div class="fg"><div class="flbl">Diastolic</div><input class="finp" type="number" id="f-bp-dia" placeholder="76" style="min-width:70px"></div>
+          <div class="fg"><div class="flbl">Pulse</div><input class="finp" type="number" id="f-bp-pulse" placeholder="65" style="min-width:60px"></div>
+          <button class="fbtn" onclick="addBP()">Add</button>
+        </div>
+      </div>
+      <div class="cw"><canvas id="c-bp"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Weight + Respiratory Rate -->
+  <div class="g2">
+    <div class="cc">
+      <div class="period-row">
+        <div><div class="ct">Body Weight</div><div class="cs">From Google Fit &middot; BMI calculated at 185 cm</div></div>
+        <div class="cls"><div class="cli"><div class="cld" style="background:#38BDF8"></div>Weight (kg)</div><div class="cli"><div class="cld" style="background:#FBBF24"></div>BMI</div></div>
+      </div>
+      <div class="form-section"><div class="fst">+ Log manually</div>
+        <div class="form-row">
+          <div class="fg"><div class="flbl">Date</div><input class="finp" type="date" id="f-wt-date"></div>
+          <div class="fg"><div class="flbl">Weight (kg)</div><input class="finp" type="number" id="f-wt-val" placeholder="91.5" step="0.1"></div>
+          <button class="fbtn" onclick="addWt()">Add</button>
+        </div>
+      </div>
+      <div class="cw-t"><canvas id="c-weight"></canvas></div>
+    </div>
+    <div class="cc">
+      <div class="period-row"><div><div class="ct">Respiratory Rate</div><div class="cs">Normal resting: 12&ndash;20 breaths/min &middot; From Google Fit</div></div></div>
+      <div class="cw-t"><canvas id="c-resp"></canvas></div>
+    </div>
+  </div>
+
+  <!-- SpO2 -->
+  <div class="g2">
+    <div class="cc">
+      <div class="period-row"><div><div class="ct">Blood Oxygen (SpO&#8322;)</div><div class="cs">Normal: 95&ndash;100% &middot; Below 95% warrants attention</div></div></div>
+      <div class="cw"><canvas id="c-spo2"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="ctitle">&#128138; Daily Supplement &amp; Medication Reminders</div>
+      <div class="ctitle" style="margin-bottom:6px">&#9201; Today &mdash; <span id="rem-date"></span></div>
+      <div id="rem-list" style="display:flex;flex-direction:column;gap:7px"></div>
+      <div style="font-size:10px;color:var(--tm);text-align:center;margin-top:8px">Resets at midnight &middot; <button onclick="resetRem()" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:10px;text-decoration:underline">Reset</button></div>
+    </div>
+  </div>
+
+  <!-- BP table -->
+  <div class="g2">
+    <div class="card">
+      <div class="ctitle">&#128203; Recent BP Readings</div>
+      <div id="bp-table-wrap"><div class="no-data"><div class="nd-icon">&#10084;</div>No readings yet.</div></div>
+      <div style="margin-top:10px;font-size:10px;color:var(--tm);line-height:1.6">
+        <strong style="color:var(--ts)">AHA/ACC:</strong> Normal &lt;120/80 &middot; Elevated 120&ndash;129/&lt;80 &middot; Stage 1: 130&ndash;139/80&ndash;89 &middot; Stage 2: &ge;140/&ge;90
+      </div>
+    </div>
+    <div class="card">
+      <div class="ctitle">&#128172; Timing Guide &mdash; Daily Supplements</div>
+      <div style="font-size:11px;color:var(--ts);line-height:1.7;display:flex;flex-direction:column;gap:7px">
+        <div><strong style="color:var(--accent)">Rosuvastatin</strong> &mdash; evening, consistent time</div>
+        <div><strong style="color:var(--accent)">NMN</strong> &mdash; morning, fasting or light breakfast</div>
+        <div><strong style="color:var(--accent)">Berberine</strong> &mdash; with largest meal</div>
+        <div><strong style="color:var(--accent)">Krill Oil</strong> &mdash; with fat-containing meal</div>
+        <div><strong style="color:var(--accent)">Creatine (planned)</strong> &mdash; post-workout or any time</div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <!-- HISTORY -->
@@ -553,7 +670,7 @@ function showTab(id, btn) {
     overview:    () => { if (!window._ov) { renderOv(); window._ov=true; } },
     labs:        () => { if (!window._lb) { renderLabs(); window._lb=true; } },
     fitness:     () => { if (!window._ft) { initFitness(); window._ft=true; } },
-    trackers:    () => { if (!window._tr) { initTrackers(); window._tr=true; } else { renderRem(); } }
+    // trackers merged into fitness tab
   };
   if (lazy[id]) lazy[id]();
 }
@@ -613,47 +730,107 @@ function renderLabs() {
 // FITNESS TRACKER
 // ══════════════════════════════════════════════
 let fC = {};
-const fKeys = ['steps','hr','sleep','vo2'];
+const fKeys = ['steps','hr','sleep'];
 const fCfg  = {
-  steps: {color:'#34D399',yL:'Steps',   tgt:10000, type:'bar'},
-  hr:    {color:'#F87171',yL:'bpm',     tgt:null,  type:'line'},
-  sleep: {color:'#38BDF8',yL:'Hours',   tgt:7.5,   type:'bar'},
-  vo2:   {color:'#FBBF24',yL:'mL/kg/min',tgt:null, type:'line'}
+  steps: {color:'#34D399',yL:'Steps',  tgt:10000,type:'bar'},
+  hr:    {color:'#F87171',yL:'bpm',    tgt:null, type:'line'},
+  sleep: {color:'#38BDF8',yL:'Hours',  tgt:7.5,  type:'bar'}
 };
+const chartPeriods = {};
+
+function filterDays(data, days) {
+  const cut = new Date();
+  cut.setDate(cut.getDate() - days);
+  const cutStr = cut.toISOString().split('T')[0];
+  return data.filter(d => !d.ts || d.ts >= cutStr);
+}
+
+function setPeriod(key, days, btn) {
+  chartPeriods[key] = days;
+  btn.parentElement.querySelectorAll('.pbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const all = store.get('fit_'+key,[]);
+  const f   = filterDays(all, days);
+  const ch  = fC[key];
+  if (!ch) return;
+  ch.data.labels = f.map(d=>d.date);
+  ch.data.datasets[0].data = f.map(d=>d.v);
+  if (ch.data.datasets[1]&&fCfg[key]&&fCfg[key].tgt) ch.data.datasets[1].data=Array(f.length).fill(fCfg[key].tgt);
+  ch.update();
+}
 
 function initFitness() {
   const t = new Date().toISOString().split('T')[0];
-  fKeys.forEach(k => { const el=document.getElementById('f-'+k+'-date'); if(el) el.value=t; });
+  ['steps','hr','sleep','bp','wt'].forEach(k=>{const el=document.getElementById('f-'+k+'-date');if(el)el.value=t;});
   fKeys.forEach(k => {
-    const cfg = fCfg[k];
-    const data = store.get('fit_'+k, []);
-    const ds = [{label:k, data:data.map(d=>d.v), borderColor:cfg.color, backgroundColor:cfg.type==='bar'?cfg.color+'99':'transparent', tension:0.3, pointRadius:3, borderRadius:3}];
+    const cfg  = fCfg[k];
+    const all  = store.get('fit_'+k,[]);
+    const data = filterDays(all, 30);
+    const ds   = [{label:k,data:data.map(d=>d.v),borderColor:cfg.color,backgroundColor:cfg.type==='bar'?cfg.color+'99':'transparent',tension:0.3,pointRadius:3,borderRadius:3}];
     if (cfg.tgt) ds.push({data:Array(Math.max(data.length,1)).fill(cfg.tgt),borderColor:'rgba(56,189,248,0.35)',borderDash:[5,5],pointRadius:0,tension:0});
-    fC[k] = new Chart(document.getElementById('c-'+k), {type:cfg.type||'line', data:{labels:data.map(d=>d.date),datasets:ds}, options:gc(cfg.yL)});
-    if (data.length) updStat(k, data[data.length-1].v);
+    fC[k]=new Chart(document.getElementById('c-'+k),{type:cfg.type||'line',data:{labels:data.map(d=>d.date),datasets:ds},options:gc(cfg.yL)});
+    chartPeriods[k]=30;
+    if (all.length) updStat(k,all[all.length-1].v);
   });
+  // BP chart
+  const bpAll = store.get('fit_bp',[]);
+  const bpD   = filterDays(bpAll,30);
+  bpC = new Chart(document.getElementById('c-bp'),{type:'line',data:{labels:bpD.map(d=>d.date),datasets:[ls(bpD.map(d=>d.sys),'#F87171'),ls(bpD.map(d=>d.dia),'#38BDF8'),{data:Array(Math.max(bpD.length,2)).fill(130),borderColor:'rgba(248,113,113,.3)',borderDash:[4,4],pointRadius:0,tension:0},{data:Array(Math.max(bpD.length,2)).fill(80),borderColor:'rgba(56,189,248,.3)',borderDash:[4,4],pointRadius:0,tension:0}]},options:gc('mmHg',50,180)});
+  if (bpAll.length) { const last=bpAll[bpAll.length-1]; updStat('bp',last.sys+'/'+last.dia); }
+  renderBPT(bpAll);
+  // Weight chart
+  const wtAll = store.get('fit_wt',[]);
+  wtC = new Chart(document.getElementById('c-weight'),{type:'line',data:{labels:wtAll.map(d=>d.date),datasets:[ls(wtAll.map(d=>d.kg),'#38BDF8',0.35,true),{data:wtAll.map(d=>d.bmi),borderColor:'#FBBF24',backgroundColor:'transparent',tension:0.35,pointRadius:2,yAxisID:'y2'}]},options:{...gc('kg'),scales:{...gc().scales,y2:{position:'right',grid:{display:false},title:{display:true,text:'BMI',color:'#64748B'}}}}});
+  // Resp Rate chart
+  const respAll = store.get('fit_resp',[]);
+  const respChart = new Chart(document.getElementById('c-resp'),{type:'line',data:{labels:respAll.map(d=>d.date),datasets:[ls(respAll.map(d=>d.v),'#A78BFA',0.35,true)]},options:gc('breaths/min',8,30)});
+  fC['resp'] = respChart;
+  if (respAll.length) updStat('resp',respAll[respAll.length-1].v);
+  // SpO2 chart
+  const spo2All = store.get('fit_spo2',[]);
+  const spo2Chart = new Chart(document.getElementById('c-spo2'),{type:'line',data:{labels:spo2All.map(d=>d.date),datasets:[ls(spo2All.map(d=>d.v),'#34D399',0.35,true),{data:Array(Math.max(spo2All.length,2)).fill(95),borderColor:'rgba(248,113,113,.35)',borderDash:[4,4],pointRadius:0,tension:0}]},options:gc('%',85,102)});
+  fC['spo2'] = spo2Chart;
+  if (spo2All.length) updStat('spo2',spo2All[spo2All.length-1].v+'%');
+  renderRem();
+  document.getElementById('rem-date').textContent=new Date().toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'});
 }
 
 function updStat(k, v) {
   const el = document.getElementById('stat-'+k);
-  if (el) el.textContent = k==='steps' ? Number(v).toLocaleString() : v;
+  if (el) el.textContent = k==='steps'?Number(v).toLocaleString():v;
 }
 
 function addFit(k) {
-  const date = document.getElementById('f-'+k+'-date').value;
-  const val  = parseFloat(document.getElementById('f-'+k+'-val').value);
+  const date=document.getElementById('f-'+k+'-date').value;
+  const val=parseFloat(document.getElementById('f-'+k+'-val').value);
   if (!date||isNaN(val)) return;
-  const data = store.get('fit_'+k, []);
-  data.push({date:date.slice(5), v:val});
-  data.sort((a,b)=>a.date.localeCompare(b.date));
-  store.set('fit_'+k, data);
-  const ch = fC[k];
-  ch.data.labels = data.map(d=>d.date);
-  ch.data.datasets[0].data = data.map(d=>d.v);
-  if (ch.data.datasets[1]) ch.data.datasets[1].data = Array(data.length).fill(fCfg[k].tgt);
-  ch.update();
-  updStat(k, val);
-  document.getElementById('f-'+k+'-val').value = '';
+  const ts=date;
+  const dispDate=new Date(date).toLocaleDateString('en-AU',{day:'numeric',month:'short'});
+  const all=store.get('fit_'+k,[]);
+  all.push({date:dispDate,ts,v:val});
+  all.sort((a,b)=>(a.ts||'').localeCompare(b.ts||''));
+  store.set('fit_'+k,all);
+  const days=chartPeriods[k]||30;
+  const f=filterDays(all,days);
+  const ch=fC[k];
+  if (ch) { ch.data.labels=f.map(d=>d.date); ch.data.datasets[0].data=f.map(d=>d.v); if(ch.data.datasets[1]&&fCfg[k]&&fCfg[k].tgt)ch.data.datasets[1].data=Array(f.length).fill(fCfg[k].tgt); ch.update(); }
+  updStat(k,val);
+  document.getElementById('f-'+k+'-val').value='';
+}
+
+function setBPPeriod(days, btn) {
+  btn.parentElement.querySelectorAll('.pbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const all=store.get('fit_bp',[]);
+  const f=filterDays(all,days);
+  const n=Math.max(f.length,2);
+  if (!bpC) return;
+  bpC.data.labels=f.map(d=>d.date);
+  bpC.data.datasets[0].data=f.map(d=>d.sys);
+  bpC.data.datasets[1].data=f.map(d=>d.dia);
+  bpC.data.datasets[2].data=Array(n).fill(130);
+  bpC.data.datasets[3].data=Array(n).fill(80);
+  bpC.update();
 }
 
 // ══════════════════════════════════════════════
@@ -664,7 +841,11 @@ const GFIT_REDIRECT  = 'https://badapple71-hash.github.io/health-dashboard/';
 const GFIT_SCOPES    = [
   'https://www.googleapis.com/auth/fitness.activity.read',
   'https://www.googleapis.com/auth/fitness.heart_rate.read',
-  'https://www.googleapis.com/auth/fitness.sleep.read'
+  'https://www.googleapis.com/auth/fitness.sleep.read',
+  'https://www.googleapis.com/auth/fitness.body.read',
+  'https://www.googleapis.com/auth/fitness.blood_pressure.read',
+  'https://www.googleapis.com/auth/fitness.respiratory_rate.read',
+  'https://www.googleapis.com/auth/fitness.oxygen_saturation.read'
 ].join(' ');
 
 function connectGFit() {
@@ -790,25 +971,57 @@ async function syncGFit() {
         if (window._ft && fC.sleep) { fC.sleep.data.labels=sleep.map(d=>d.date); fC.sleep.data.datasets[0].data=sleep.map(d=>d.v); if(fC.sleep.data.datasets[1])fC.sleep.data.datasets[1].data=Array(sleep.length).fill(7.5); fC.sleep.update(); }
       }
     }
+
+    // ── WEIGHT ──
+    const wtRes = await fetch('https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate',{
+      method:'POST',headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
+      body:JSON.stringify({aggregateBy:[{dataTypeName:'com.google.weight'}],bucketByTime:{durationMillis:86400000},startTimeMillis:d30,endTimeMillis:now})
+    });
+    if(wtRes.ok){const wd=await wtRes.json();const wtData=wd.bucket.map(b=>{const pts=b.dataset[0]?.point||[];if(!pts.length)return null;const kg=Math.round(pts[0].value?.[0]?.fpVal*10)/10;if(!kg)return null;const bmi=Math.round((kg/3.4225)*10)/10;const ts=new Date(parseInt(b.startTimeMillis)).toISOString().split('T')[0];return{date:new Date(parseInt(b.startTimeMillis)).toLocaleDateString('en-AU',{day:'numeric',month:'short'}),kg,bmi,ts};}).filter(d=>d&&d.kg>30&&d.kg<300);if(wtData.length){store.set('fit_wt',wtData);if(window._ft&&wtC){wtC.data.labels=wtData.map(d=>d.date);wtC.data.datasets[0].data=wtData.map(d=>d.kg);wtC.data.datasets[1].data=wtData.map(d=>d.bmi);wtC.update();}}}
+
+    // ── BLOOD PRESSURE from Google Fit ──
+    const bpRes = await fetch('https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate',{
+      method:'POST',headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
+      body:JSON.stringify({aggregateBy:[{dataTypeName:'com.google.blood_pressure'}],bucketByTime:{durationMillis:86400000},startTimeMillis:d30,endTimeMillis:now})
+    });
+    if(bpRes.ok){const bpd=await bpRes.json();const bpPoints=[];bpd.bucket.forEach(b=>{const pts=b.dataset[0]?.point||[];pts.forEach(p=>{const sys=Math.round(p.value?.[0]?.fpVal||0);const dia=Math.round(p.value?.[1]?.fpVal||0);if(sys>60&&dia>30){const ts=new Date(parseInt(b.startTimeMillis)).toISOString().split('T')[0];bpPoints.push({date:new Date(parseInt(b.startTimeMillis)).toLocaleDateString('en-AU',{day:'numeric',month:'short'}),sys,dia,pulse:null,ts});}});});if(bpPoints.length){store.set('fit_bp',bpPoints);const last=bpPoints[bpPoints.length-1];updStat('bp',last.sys+'/'+last.dia);renderBPT(bpPoints);if(window._ft&&bpC){const f=filterDays(bpPoints,30);const n=Math.max(f.length,2);bpC.data.labels=f.map(d=>d.date);bpC.data.datasets[0].data=f.map(d=>d.sys);bpC.data.datasets[1].data=f.map(d=>d.dia);bpC.data.datasets[2].data=Array(n).fill(130);bpC.data.datasets[3].data=Array(n).fill(80);bpC.update();}}}
+
+    // ── RESPIRATORY RATE ──
+    const rrRes = await fetch('https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate',{
+      method:'POST',headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
+      body:JSON.stringify({aggregateBy:[{dataTypeName:'com.google.respiratory_rate'}],bucketByTime:{durationMillis:86400000},startTimeMillis:d30,endTimeMillis:now})
+    });
+    if(rrRes.ok){const rrd=await rrRes.json();const rrData=rrd.bucket.map(b=>{const pts=b.dataset[0]?.point||[];if(!pts.length)return null;const v=Math.round(pts.reduce((s,p)=>s+(p.value?.[0]?.fpVal||0),0)/pts.length*10)/10;if(!v)return null;return{date:new Date(parseInt(b.startTimeMillis)).toLocaleDateString('en-AU',{day:'numeric',month:'short'}),v,ts:new Date(parseInt(b.startTimeMillis)).toISOString().split('T')[0]};}).filter(d=>d&&d.v>0);if(rrData.length){store.set('fit_resp',rrData);updStat('resp',rrData[rrData.length-1].v);if(window._ft&&fC.resp){fC.resp.data.labels=rrData.map(d=>d.date);fC.resp.data.datasets[0].data=rrData.map(d=>d.v);fC.resp.update();}}}
+
+    // ── SPO2 ──
+    const spo2Res = await fetch('https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate',{
+      method:'POST',headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
+      body:JSON.stringify({aggregateBy:[{dataTypeName:'com.google.oxygen_saturation'}],bucketByTime:{durationMillis:86400000},startTimeMillis:d30,endTimeMillis:now})
+    });
+    if(spo2Res.ok){const sd=await spo2Res.json();const spo2Data=sd.bucket.map(b=>{const pts=b.dataset[0]?.point||[];if(!pts.length)return null;const v=Math.round(pts.reduce((s,p)=>s+(p.value?.[0]?.fpVal||0),0)/pts.length*10)/10;if(!v)return null;return{date:new Date(parseInt(b.startTimeMillis)).toLocaleDateString('en-AU',{day:'numeric',month:'short'}),v,ts:new Date(parseInt(b.startTimeMillis)).toISOString().split('T')[0]};}).filter(d=>d&&d.v>50);if(spo2Data.length){store.set('fit_spo2',spo2Data);updStat('spo2',spo2Data[spo2Data.length-1].v+'%');if(window._ft&&fC.spo2){fC.spo2.data.labels=spo2Data.map(d=>d.date);fC.spo2.data.datasets[0].data=spo2Data.map(d=>d.v);if(fC.spo2.data.datasets[1])fC.spo2.data.datasets[1].data=Array(spo2Data.length).fill(95);fC.spo2.update();}}}
+
+    // ── ACTIVE MINUTES ──
+    const amRes = await fetch('https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate',{
+      method:'POST',headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
+      body:JSON.stringify({aggregateBy:[{dataTypeName:'com.google.active_minutes'}],bucketByTime:{durationMillis:86400000},startTimeMillis:d30,endTimeMillis:now})
+    });
+    if(amRes.ok){const amd=await amRes.json();if(amd.bucket&&amd.bucket.length){const last=amd.bucket[amd.bucket.length-1];const v=last.dataset[0]?.point?.[0]?.value?.[0]?.intVal||0;if(v)updStat('actmin',v+' min');}}
+
+    // ── CALORIES ──
+    const calRes = await fetch('https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate',{
+      method:'POST',headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
+      body:JSON.stringify({aggregateBy:[{dataTypeName:'com.google.calories.expended'}],bucketByTime:{durationMillis:86400000},startTimeMillis:d30,endTimeMillis:now})
+    });
+    if(calRes.ok){const cald=await calRes.json();if(cald.bucket&&cald.bucket.length){const last=cald.bucket[cald.bucket.length-1];const v=Math.round(last.dataset[0]?.point?.[0]?.value?.[0]?.fpVal||0);if(v)updStat('cal',v.toLocaleString()+' kcal');}}
+
+    console.log('Google Fit sync complete');
   } catch(e) { console.error('Google Fit sync error:',e); }
 }
 
 // ══════════════════════════════════════════════
-// BLOOD PRESSURE TRACKER
+// BLOOD PRESSURE & WEIGHT (now in fitness tab)
 // ══════════════════════════════════════════════
 let bpC, wtC;
-function initTrackers() {
-  const t = new Date().toISOString().split('T')[0];
-  ['bp','wt'].forEach(k=>{const el=document.getElementById('f-'+k+'-date');if(el)el.value=t;});
-  const bd = store.get('bp',[]);
-  bpC = new Chart(document.getElementById('c-bp'),{type:'line',data:{labels:bd.map(d=>d.date),datasets:[ls(bd.map(d=>d.sys),'#F87171'),ls(bd.map(d=>d.dia),'#38BDF8'),{data:Array(Math.max(bd.length,2)).fill(130),borderColor:'rgba(248,113,113,.3)',borderDash:[4,4],pointRadius:0,tension:0},{data:Array(Math.max(bd.length,2)).fill(80),borderColor:'rgba(56,189,248,.3)',borderDash:[4,4],pointRadius:0,tension:0}]},options:gc('mmHg',50,180)});
-  renderBPT(bd);
-  const wd = store.get('wt',[]);
-  wtC = new Chart(document.getElementById('c-weight'),{type:'line',data:{labels:wd.map(d=>d.date),datasets:[ls(wd.map(d=>d.kg),'#38BDF8',0.35,true),{data:wd.map(d=>d.bmi),borderColor:'#FBBF24',backgroundColor:'transparent',tension:0.35,pointRadius:2,yAxisID:'y2'}]},options:{...gc('kg'),scales:{...gc().scales,y2:{position:'right',grid:{display:false},title:{display:true,text:'BMI',color:'#64748B'}}}}});
-  renderWtT(wd);
-  renderRem();
-  document.getElementById('rem-date').textContent=new Date().toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'});
-}
 
 function addBP() {
   const date=document.getElementById('f-bp-date').value;
@@ -816,24 +1029,24 @@ function addBP() {
   const dia=parseInt(document.getElementById('f-bp-dia').value);
   const pulse=parseInt(document.getElementById('f-bp-pulse').value)||null;
   if (!date||isNaN(sys)||isNaN(dia)) return;
-  const data=store.get('bp',[]);
-  data.push({date:date.slice(5),sys,dia,pulse,ts:date});
+  const dispDate=new Date(date).toLocaleDateString('en-AU',{day:'numeric',month:'short'});
+  const data=store.get('fit_bp',[]);
+  data.push({date:dispDate,sys,dia,pulse,ts:date});
   data.sort((a,b)=>a.ts.localeCompare(b.ts));
-  store.set('bp',data);
-  const n=Math.max(data.length,2);
-  bpC.data.labels=data.map(d=>d.date);
-  bpC.data.datasets[0].data=data.map(d=>d.sys);
-  bpC.data.datasets[1].data=data.map(d=>d.dia);
-  bpC.data.datasets[2].data=Array(n).fill(130);
-  bpC.data.datasets[3].data=Array(n).fill(80);
-  bpC.update(); renderBPT(data);
+  store.set('fit_bp',data);
+  const days=30; const f=filterDays(data,days);
+  const n=Math.max(f.length,2);
+  if (bpC) { bpC.data.labels=f.map(d=>d.date); bpC.data.datasets[0].data=f.map(d=>d.sys); bpC.data.datasets[1].data=f.map(d=>d.dia); bpC.data.datasets[2].data=Array(n).fill(130); bpC.data.datasets[3].data=Array(n).fill(80); bpC.update(); }
+  updStat('bp',sys+'/'+dia);
+  renderBPT(data);
   ['f-bp-sys','f-bp-dia','f-bp-pulse'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
 }
 
 function renderBPT(data) {
   const w=document.getElementById('bp-table-wrap');
-  if(!data.length){w.innerHTML='<div class="no-data"><div class="nd-icon">&#10084;</div>No readings yet.</div>';return;}
-  const rows=data.slice(-6).reverse().map(d=>{
+  if(!w) return;
+  if(!data||!data.length){w.innerHTML='<div class="no-data"><div class="nd-icon">&#10084;</div>No readings yet.</div>';return;}
+  const rows=data.slice(-8).reverse().map(d=>{
     const c=d.sys<120?'var(--good)':d.sys<130?'var(--warn)':'var(--bad)';
     return `<tr><td style="font-family:var(--mono)">${d.date}</td><td style="font-family:var(--mono);color:${c};font-weight:700">${d.sys}</td><td style="font-family:var(--mono)">${d.dia}</td><td style="font-family:var(--mono)">${d.pulse||'&mdash;'}</td></tr>`;
   }).join('');
@@ -845,25 +1058,13 @@ function addWt() {
   const kg=parseFloat(document.getElementById('f-wt-val').value);
   if(!date||isNaN(kg)) return;
   const bmi=Math.round((kg/3.4225)*10)/10;
-  const data=store.get('wt',[]);
-  data.push({date:date.slice(5),kg,bmi,ts:date});
+  const dispDate=new Date(date).toLocaleDateString('en-AU',{day:'numeric',month:'short'});
+  const data=store.get('fit_wt',[]);
+  data.push({date:dispDate,kg,bmi,ts:date});
   data.sort((a,b)=>a.ts.localeCompare(b.ts));
-  store.set('wt',data);
-  wtC.data.labels=data.map(d=>d.date);
-  wtC.data.datasets[0].data=data.map(d=>d.kg);
-  wtC.data.datasets[1].data=data.map(d=>d.bmi);
-  wtC.update(); renderWtT(data);
+  store.set('fit_wt',data);
+  if (wtC) { wtC.data.labels=data.map(d=>d.date); wtC.data.datasets[0].data=data.map(d=>d.kg); wtC.data.datasets[1].data=data.map(d=>d.bmi); wtC.update(); }
   document.getElementById('f-wt-val').value='';
-}
-
-function renderWtT(data) {
-  const w=document.getElementById('wt-table-wrap');
-  if(!data.length){w.innerHTML='<div class="no-data"><div class="nd-icon">&#9878;</div>No entries yet.<br>Current: ~92 kg &middot; BMI 26.9</div>';return;}
-  const rows=data.slice(-6).reverse().map(d=>{
-    const c=d.bmi<25?'var(--good)':d.bmi<30?'var(--warn)':'var(--bad)';
-    return `<tr><td style="font-family:var(--mono)">${d.date}</td><td style="font-family:var(--mono)">${d.kg} kg</td><td style="font-family:var(--mono);color:${c};font-weight:700">${d.bmi}</td></tr>`;
-  }).join('');
-  w.innerHTML=`<table class="rtbl"><thead><tr><th>Date</th><th>Weight</th><th>BMI</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
 // ══════════════════════════════════════════════
