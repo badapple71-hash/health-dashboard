@@ -1236,19 +1236,42 @@ async function syncGFit() {
     // Steps
     const sr = await fetch('https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate',{
       method:'POST', headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
-      body:JSON.stringify({aggregateBy:[{dataTypeName:'com.google.step_count.delta'}],bucketByTime:{durationMillis:86400000},startTimeMillis:d30,endTimeMillis:now})
+      body:JSON.stringify({
+        aggregateBy:[{dataTypeName:'com.google.step_count.delta'}],
+        bucketByTime:{ period:{ type:'day', value:1, timeZoneId:'Australia/Brisbane' } },
+        startTimeMillis:d30, endTimeMillis:now
+      })
     });
     if (sr.ok) {
       const sd = await sr.json();
       const steps = sd.bucket.map(b=>{
-        const ts = new Date(parseInt(b.startTimeMillis)).toISOString().split('T')[0];
-        const v  = b.dataset[0]?.point?.reduce((s,p)=>s+(p.value?.[0]?.intVal||0),0)||0;
-        return {date:new Date(parseInt(b.startTimeMillis)).toLocaleDateString('en-AU',{day:'numeric',month:'short'}), ts, v};
-      }).filter(d=>d.v>0);
+        // Sum ALL datasets — handles multiple step sources without double-counting
+        let v = 0;
+        (b.dataset||[]).forEach(ds=>{ (ds.point||[]).forEach(p=>{ v += (p.value?.[0]?.intVal||0); }); });
+        if (!v) return null;
+        // Use LOCAL date — critical for Brisbane UTC+10 (UTC midnight ≠ local midnight)
+        const dt = new Date(parseInt(b.startTimeMillis));
+        const ts = dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');
+        return {date:dt.toLocaleDateString('en-AU',{day:'numeric',month:'short'}), ts, v};
+      }).filter(d=>d);
       if (steps.length) {
         store.set('fit_steps', steps);
-        updStat('steps', steps[steps.length-1].v);
-        if (window._ft && fC.steps) { fC.steps.data.labels=steps.map(d=>d.date); fC.steps.data.datasets[0].data=steps.map(d=>d.v); if(fC.steps.data.datasets[1])fC.steps.data.datasets[1].data=Array(steps.length).fill(10000); fC.steps.update(); }
+        // Find TODAY's bucket specifically — not just the "latest" (which may be yesterday)
+        const todayTs = (()=>{ const n=new Date(); return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0'); })();
+        const todayRow = steps.find(s=>s.ts===todayTs);
+        const showRow  = todayRow || steps[steps.length-1];
+        const el = document.getElementById('stat-steps');
+        if (el) el.textContent = Number(showRow.v).toLocaleString();
+        const fss = el&&el.closest('.fit-stat')&&el.closest('.fit-stat').querySelector('.fss');
+        if (fss) fss.textContent = todayRow ? 'today' : 'latest: '+showRow.date;
+        console.log('[Steps] API data:', steps.length, 'days | Today ('+todayTs+'):', todayRow ? todayRow.v+' steps' : 'no data yet | Latest:', steps[steps.length-1].date, steps[steps.length-1].v, 'steps');
+        if (window._ft && fC.steps) {
+          const f = filterDays(steps, chartPeriods['steps']||30);
+          fC.steps.data.labels=f.map(d=>d.date);
+          fC.steps.data.datasets[0].data=f.map(d=>d.v);
+          if(fC.steps.data.datasets[1])fC.steps.data.datasets[1].data=Array(f.length).fill(10000);
+          fC.steps.update();
+        }
       }
     }
     // Resting HR
@@ -1263,8 +1286,9 @@ async function syncGFit() {
         if (!pts.length) return null;
         const vals = pts.map(p=>p.value?.[0]?.fpVal||0).filter(v=>v>0);
         if (!vals.length) return null;
-        const ts = new Date(parseInt(b.startTimeMillis)).toISOString().split('T')[0];
-        return {date:new Date(parseInt(b.startTimeMillis)).toLocaleDateString('en-AU',{day:'numeric',month:'short'}), ts, v:Math.round(Math.min(...vals))};
+        const _dt = new Date(parseInt(b.startTimeMillis));
+        const ts = _dt.getFullYear()+'-'+String(_dt.getMonth()+1).padStart(2,'0')+'-'+String(_dt.getDate()).padStart(2,'0');
+        return {date:_dt.toLocaleDateString('en-AU',{day:'numeric',month:'short'}), ts, v:Math.round(Math.min(...vals))};
       }).filter(d=>d&&d.v>30&&d.v<220);
       if (hrs.length) {
         store.set('fit_hr', hrs);
