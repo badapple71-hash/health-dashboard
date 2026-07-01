@@ -375,6 +375,7 @@ body.edit-mode .sortable-item{border:1px dashed rgba(56,189,248,0.25);border-rad
     <div>
       <div class="gfit-title">&#127939; Google Fit</div>
       <div class="gfit-sub" id="gfit-sub-text">Connect to sync steps, heart rate, blood pressure, weight, SpO&#8322; and more.</div>
+      <div style="font-size:10px;color:var(--tm);margin-top:3px">&#9432; Data comes from Google Fit&#8217;s cloud. If today&#8217;s steps are missing, open Google Fit on your phone first to trigger a cloud upload, then tap Sync now.</div>
     </div>
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
       <button class="edit-layout-btn" id="edit-layout-btn" onclick="toggleEditLayout()">&#8285; Edit Layout</button>
@@ -405,7 +406,7 @@ body.edit-mode .sortable-item{border:1px dashed rgba(56,189,248,0.25);border-rad
       <div class="g2">
         <div class="cc">
           <div class="period-row">
-            <div><div class="ct">Daily Steps</div><div class="cs">Target 10,000/day</div></div>
+            <div><div class="ct">Daily Steps</div><div class="cs">Target 10,000/day &middot; <span id="steps-sync-ts" style="color:var(--tm)">tap Sync to load</span></div></div>
             <div class="period-btns">
               <button class="pbtn" onclick="setPeriod('steps',7,this)">7D</button>
               <button class="pbtn active" onclick="setPeriod('steps',30,this)">30D</button>
@@ -968,7 +969,15 @@ function initFitness() {
       if (!canvas) { console.warn('Canvas not found: c-'+k); return; }
       const ds = [{label:k,data:data.map(d=>d.v),borderColor:cfg.color,backgroundColor:cfg.type==='bar'?cfg.color+'99':'transparent',tension:0.3,pointRadius:3,borderRadius:3}];
       if (cfg.tgt) ds.push({data:Array(Math.max(data.length,1)).fill(cfg.tgt),borderColor:'rgba(56,189,248,0.35)',borderDash:[5,5],pointRadius:0,tension:0});
-      fC[k]=new Chart(canvas,{type:cfg.type||'line',data:{labels:data.map(d=>d.date),datasets:ds},options:gc(cfg.yL)});
+      const chartOpts = gc(cfg.yL);
+      // For steps: show date + count in tooltip for easy verification
+      if (k === 'steps') {
+        chartOpts.plugins.tooltip.callbacks = {
+          title: (items) => items[0].label,
+          label: (item) => ' ' + Number(item.raw).toLocaleString() + ' steps'
+        };
+      }
+      fC[k]=new Chart(canvas,{type:cfg.type||'line',data:{labels:data.map(d=>d.date),datasets:ds},options:chartOpts});
       chartPeriods[k]=30;
       if (all.length) updStat(k,all[all.length-1].v);
     } catch(e) { console.error('Chart init error ('+k+'):', e); }
@@ -1264,6 +1273,19 @@ async function syncGFit() {
         if (el) el.textContent = Number(showRow.v).toLocaleString();
         const fss = el&&el.closest('.fit-stat')&&el.closest('.fit-stat').querySelector('.fss');
         if (fss) fss.textContent = todayRow ? 'today' : 'latest: '+showRow.date;
+        // Update sync timestamp label
+        const syncTs = document.getElementById('steps-sync-ts');
+        if (syncTs) {
+          const latestDate = steps[steps.length-1].date;
+          const syncTime   = new Date().toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'});
+          if (todayRow) {
+            syncTs.textContent = 'synced ' + syncTime + ' \u2014 showing today';
+            syncTs.style.color = 'var(--good)';
+          } else {
+            syncTs.textContent = 'latest cloud data: ' + latestDate + ' \u2014 open Google Fit app to sync today';
+            syncTs.style.color = 'var(--warn)';
+          }
+        }
         console.log('[Steps] API data:', steps.length, 'days | Today ('+todayTs+'):', todayRow ? todayRow.v+' steps' : 'no data yet | Latest:', steps[steps.length-1].date, steps[steps.length-1].v, 'steps');
         if (window._ft && fC.steps) {
           const f = filterDays(steps, chartPeriods['steps']||30);
