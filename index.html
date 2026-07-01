@@ -8,6 +8,7 @@
 <link id="manifest-link" rel="manifest">
 <title>Baden Appleyard &mdash; Health Dashboard</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
 <style>
 :root{--bg:#0A0E1A;--s1:#111827;--s2:#1C2333;--s3:#2D3748;--border:#2D3748;--tp:#E2E8F0;--ts:#94A3B8;--tm:#64748B;--accent:#38BDF8;--aglow:rgba(56,189,248,0.12);--good:#34D399;--gbg:rgba(52,211,153,0.1);--warn:#FBBF24;--wbg:rgba(251,191,36,0.1);--bad:#F87171;--rbg:rgba(248,113,113,0.1);--r:12px;--rs:8px;--mono:'JetBrains Mono','Cascadia Code',monospace}
@@ -244,7 +245,7 @@ body.edit-mode .sortable-item{border:1px dashed rgba(56,189,248,0.25);border-rad
       <div>
         <div class="eyebrow">Personal Health Dashboard &middot; Confidential &middot; <span id="hdr-date">June 2026</span></div>
         <div class="hdr-name">Baden Appleyard</div>
-        <div class="hdr-sub">Male &middot; Age <span id="hdr-age">55</span> &middot; 185 cm &middot; <span id="hdr-weight">92</span> kg &middot; Carindale QLD &middot; Non-smoker &middot; Non-drinker</div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><div class="hdr-sub">Male &middot; Age <span id="hdr-age">55</span> &middot; 185 cm &middot; <span id="hdr-weight">92</span> kg &middot; Carindale QLD &middot; Non-smoker &middot; Non-drinker</div><span id="sync-badge" style="font-size:10px;color:var(--good);opacity:0;transition:opacity 1s;background:var(--gbg);padding:2px 8px;border-radius:10px;flex-shrink:0"></span></div>
       </div>
       <div class="hdr-right">
         <button class="theme-btn" onclick="toggleTheme()" id="theme-btn">&#9790; Light Mode</button>
@@ -634,36 +635,147 @@ body.edit-mode .sortable-item{border:1px dashed rgba(56,189,248,0.25);border-rad
 // ══════════════════════════════════════════════
 // STORAGE — localStorage + in-memory fallback
 // ══════════════════════════════════════════════
+// ══════════════════════════════════════════════
+// SUPABASE CLIENT
+// ══════════════════════════════════════════════
+const SUPA_URL = 'https://anytuxyclansxishxvqh.supabase.co';
+const SUPA_KEY = 'sb_publishable_nE2NwJGRPav-hK_yoQs2Tw_GpkYx36C';
+const USER_EMAIL = 'badapple71@gmail.com';
+let db = null;
+let dbReady = false;
+
+async function manualSync() {
+  const el = document.getElementById('supa-status');
+  if (el) el.innerHTML = '&#9679; Syncing...';
+  if (!dbReady) {
+    if (el) el.innerHTML = '<span style="color:var(--bad)">&#9679; Not connected &mdash; please log in again</span>';
+    return;
+  }
+  await pullFromSupabase();
+  if (el) el.innerHTML = '<span style="color:var(--good)">&#9679; Connected &mdash; last sync: ' + new Date().toLocaleTimeString() + '</span>';
+  if (window._ov) renderOv();
+  if (window._ft) {
+    // Refresh fitness charts
+    ['steps','hr','sleep'].forEach(k => {
+      if (fC[k]) {
+        const all = store.get('fit_'+k,[]);
+        const f = filterDays(all, chartPeriods[k]||30);
+        fC[k].data.labels = f.map(d=>d.date);
+        fC[k].data.datasets[0].data = f.map(d=>d.v);
+        fC[k].update();
+      }
+    });
+  }
+}
+
+function updateSupabaseStatus() {
+  const el = document.getElementById('supa-status');
+  if (!el) return;
+  if (dbReady) {
+    el.innerHTML = '<span style="color:var(--good)">&#9679; Connected to Supabase &mdash; data syncing across all devices</span>';
+  } else {
+    el.innerHTML = '<span style="color:var(--warn)">&#9679; Not signed in to Supabase &mdash; log out and back in to enable cloud sync</span>';
+  }
+}
+
+function initSupabase() {
+  try {
+    if (typeof supabase !== 'undefined' && supabase.createClient) {
+      db = supabase.createClient(SUPA_URL, SUPA_KEY, {
+        auth: { persistSession: true, autoRefreshToken: true }
+      });
+      console.log('Supabase client initialised');
+      return true;
+    }
+  } catch(e) { console.error('Supabase init error:', e); }
+  return false;
+}
+
+async function supabaseSignIn(password) {
+  if (!db) return false;
+  try {
+    const { data, error } = await db.auth.signInWithPassword({
+      email: USER_EMAIL, password
+    });
+    if (error) { console.warn('Supabase auth failed:', error.message); return false; }
+    dbReady = true;
+    console.log('Supabase signed in OK');
+    return true;
+  } catch(e) { console.error('Supabase signIn error:', e); return false; }
+}
+
+async function supabaseRestoreSession() {
+  if (!db) return false;
+  try {
+    const { data: { session } } = await db.auth.getSession();
+    if (session) { dbReady = true; console.log('Supabase session restored'); return true; }
+  } catch(e) {}
+  return false;
+}
+
+// Keys that sync to Supabase
+const SYNC_KEYS = ['fit_steps','fit_hr','fit_sleep','fit_bp','fit_spo2','fit_wt','fit_resp','row_order','hidden_rows'];
+
+async function pushToSupabase(key, value) {
+  if (!db || !dbReady) return;
+  try {
+    const { error } = await db.from('health_data').upsert(
+      { key, data: value, updated_at: new Date().toISOString() },
+      { onConflict: 'user_id,key' }
+    );
+    if (error) console.error('Supabase push error for', key, ':', error.message);
+  } catch(e) { console.error('pushToSupabase error:', e); }
+}
+
+async function pullFromSupabase() {
+  if (!db || !dbReady) return;
+  try {
+    const { data, error } = await db.from('health_data').select('key, data');
+    if (error) { console.error('Supabase pull error:', error.message); return; }
+    if (data && data.length) {
+      data.forEach(row => {
+        store._setLocal(row.key, row.data);
+      });
+      console.log('Pulled', data.length, 'keys from Supabase');
+      showSyncBadge('Synced from cloud ✓');
+    }
+  } catch(e) { console.error('pullFromSupabase error:', e); }
+}
+
+function showSyncBadge(msg) {
+  const b = document.getElementById('sync-badge');
+  if (b) { b.textContent = msg; b.style.opacity='1'; setTimeout(()=>b.style.opacity='0',3000); }
+}
+
+// ══════════════════════════════════════════════
+// LOCAL STORE (localStorage + in-memory)
+// ══════════════════════════════════════════════
 const store = (() => {
-  // Test localStorage immediately — fail fast, no silent swallowing
   let _lsOk = false;
   try {
-    const _t = '__hd_test__';
-    localStorage.setItem(_t, '1');
-    _lsOk = localStorage.getItem(_t) === '1';
-    localStorage.removeItem(_t);
+    localStorage.setItem('__hd_t__','1');
+    _lsOk = localStorage.getItem('__hd_t__')==='1';
+    localStorage.removeItem('__hd_t__');
   } catch(e) { _lsOk = false; }
   const _m = {};
   return {
     isOk: () => _lsOk,
+    // Write to local only (called by Supabase pull to populate cache)
+    _setLocal(k, v) {
+      _m[k] = v;
+      if (_lsOk) try { localStorage.setItem('hd_'+k, JSON.stringify(v)); } catch(e) {}
+    },
     get(k, def) {
       if (_lsOk) {
-        try {
-          const raw = localStorage.getItem('hd_' + k);
-          if (raw !== null) return JSON.parse(raw);
-        } catch(e) { console.warn('store.get parse error', k, e); }
+        try { const raw=localStorage.getItem('hd_'+k); if(raw!==null) return JSON.parse(raw); } catch(e) {}
       }
-      return k in _m ? _m[k] : (def !== undefined ? def : null);
+      return k in _m ? _m[k] : (def!==undefined ? def : null);
     },
     set(k, v) {
       _m[k] = v;
-      if (_lsOk) {
-        try { localStorage.setItem('hd_' + k, JSON.stringify(v)); }
-        catch(e) {
-          console.error('store.set failed for', k, e);
-          _lsOk = false; // stop trying if quota exceeded etc.
-        }
-      }
+      if (_lsOk) try { localStorage.setItem('hd_'+k, JSON.stringify(v)); } catch(e) { _lsOk=false; }
+      // Push to Supabase async for sync keys
+      if (SYNC_KEYS.includes(k)) pushToSupabase(k, v);
     }
   };
 })();
@@ -684,12 +796,25 @@ async function doAuth() {
   if (!inp.value) return;
   const hash = await sha256(inp.value);
   if (hash === AUTH_HASH) {
+    const pwd = inp.value; // capture before clearing
     store.set('auth_hash', hash);
     const screen = document.getElementById('auth-screen');
     screen.style.transition = 'opacity .4s';
     screen.style.opacity = '0';
     setTimeout(() => screen.remove(), 400);
     initApp();
+    // Sign into Supabase and pull cloud data in background
+    supabaseSignIn(pwd).then(ok => {
+      if (ok) {
+        showSyncBadge('Connected to cloud ✓');
+        pullFromSupabase().then(() => {
+          updateSupabaseStatus();
+          if (window._ov) renderOv();
+        });
+      } else {
+        showSyncBadge('Cloud sync unavailable — check credentials');
+      }
+    });
   } else {
     err.textContent = 'Incorrect password — please try again';
     inp.value = '';
@@ -1445,6 +1570,8 @@ function updateDynamicHeader() {
 function initApp() {
   // Update dynamic header values
   updateDynamicHeader();
+  // Update Supabase status (async)
+  setTimeout(updateSupabaseStatus, 1500);
   // Warn if localStorage is unavailable (data won't persist)
   if (!store.isOk()) {
     const w = document.createElement('div');
@@ -1469,12 +1596,21 @@ function initApp() {
 
 // Boot
 window.addEventListener('DOMContentLoaded', () => {
+  // Initialise Supabase client
+  initSupabase();
   if (checkSavedAuth()) {
     const s = document.getElementById('auth-screen');
     if (s) s.remove();
     initApp();
+    // Try to restore existing Supabase session and pull latest data
+    supabaseRestoreSession().then(ok => {
+      if (ok) {
+        pullFromSupabase().then(() => {
+          if (window._ov) renderOv();
+        });
+      }
+    });
   }
-  // If auth screen is showing, allow Enter key
   const inp = document.getElementById('pwd-inp');
   if (inp) inp.focus();
 });
