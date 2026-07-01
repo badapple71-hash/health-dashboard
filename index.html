@@ -1248,7 +1248,7 @@ async function syncGFit() {
       body:JSON.stringify({
         aggregateBy:[{dataTypeName:'com.google.step_count.delta'}],
         bucketByTime:{ period:{ type:'day', value:1, timeZoneId:'Australia/Brisbane' } },
-        startTimeMillis:d30, endTimeMillis:now
+        startTimeMillis:d90, endTimeMillis:now + 86400000
       })
     });
     if (sr.ok) {
@@ -1272,7 +1272,7 @@ async function syncGFit() {
         const el = document.getElementById('stat-steps');
         if (el) el.textContent = Number(showRow.v).toLocaleString();
         const fss = el&&el.closest('.fit-stat')&&el.closest('.fit-stat').querySelector('.fss');
-        if (fss) fss.textContent = todayRow ? 'today' : 'latest: '+showRow.date;
+        if (fss) fss.textContent = showRow.date + (todayRow ? ' (today)' : ' — tap Sync now to refresh');
         // Update sync timestamp label
         const syncTs = document.getElementById('steps-sync-ts');
         if (syncTs) {
