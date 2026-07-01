@@ -413,13 +413,7 @@ body.edit-mode .sortable-item{border:1px dashed rgba(56,189,248,0.25);border-rad
               <button class="pbtn" onclick="setPeriod('steps',90,this)">90D</button>
             </div>
           </div>
-          <div class="form-section"><div class="fst">+ Log manually</div>
-            <div class="form-row">
-              <div class="fg"><div class="flbl">Date</div><input class="finp" type="date" id="f-steps-date"></div>
-              <div class="fg"><div class="flbl">Steps</div><input class="finp" type="number" id="f-steps-val" placeholder="8500"></div>
-              <button class="fbtn" onclick="addFit('steps')">Add</button>
-            </div>
-          </div>
+          <div style="font-size:10px;color:var(--tm);padding:6px 0 4px;font-style:italic">Steps populated automatically from Google Fit sync only.</div>
           <div class="cw"><canvas id="c-steps"></canvas></div>
         </div>
         <div class="cc">
@@ -693,16 +687,33 @@ function initSupabase() {
 }
 
 async function supabaseSignIn(password) {
-  if (!db) return false;
+  if (!db) {
+    showSupabaseError('Supabase client not initialised — check CDN');
+    return false;
+  }
   try {
     const { data, error } = await db.auth.signInWithPassword({
       email: USER_EMAIL, password
     });
-    if (error) { console.warn('Supabase auth failed:', error.message); return false; }
+    if (error) {
+      console.error('Supabase auth failed:', error.message, error);
+      showSupabaseError('Auth failed: '+error.message+'. Check your anon key in Project Settings → API.');
+      return false;
+    }
     dbReady = true;
-    console.log('Supabase signed in OK');
+    console.log('Supabase signed in OK — session:', data.session?.access_token?.slice(0,20)+'...');
     return true;
-  } catch(e) { console.error('Supabase signIn error:', e); return false; }
+  } catch(e) {
+    console.error('Supabase signIn error:', e);
+    showSupabaseError('Connection error: '+e.message);
+    return false;
+  }
+}
+
+function showSupabaseError(msg) {
+  const el = document.getElementById('supa-status');
+  if (el) el.innerHTML = '<span style="color:var(--bad)">&#9679; '+msg+'</span>';
+  console.error('[Supabase]', msg);
 }
 
 async function supabaseRestoreSession() {
@@ -718,14 +729,22 @@ async function supabaseRestoreSession() {
 const SYNC_KEYS = ['fit_steps','fit_hr','fit_sleep','fit_bp','fit_spo2','fit_wt','fit_resp','row_order','hidden_rows'];
 
 async function pushToSupabase(key, value) {
-  if (!db || !dbReady) return;
+  if (!db || !dbReady) {
+    console.warn('[Supabase] Not ready — skipping push for', key);
+    return;
+  }
   try {
     const { error } = await db.from('health_data').upsert(
       { key, data: value, updated_at: new Date().toISOString() },
       { onConflict: 'user_id,key' }
     );
-    if (error) console.error('Supabase push error for', key, ':', error.message);
-  } catch(e) { console.error('pushToSupabase error:', e); }
+    if (error) {
+      console.error('[Supabase] Push failed for', key+':', error.message, error);
+      showSyncBadge('Sync error — '+error.message);
+    } else {
+      console.log('[Supabase] Saved:', key, '('+(Array.isArray(value)?value.length+' records':'value')+')');
+    }
+  } catch(e) { console.error('[Supabase] pushToSupabase error:', e); }
 }
 
 async function pullFromSupabase() {
@@ -1247,28 +1266,26 @@ async function syncGFit() {
       method:'POST', headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
       body:JSON.stringify({
         aggregateBy:[{dataTypeName:'com.google.step_count.delta'}],
-        bucketByTime:{ durationMillis:3600000 },
-        startTimeMillis:d90, endTimeMillis:now + 86400000
+        bucketByTime:{ durationMillis:86400000 },
+        startTimeMillis:d30, endTimeMillis:now + 90000000
       })
     });
     if (sr.ok) {
       const sd = await sr.json();
-      // Aggregate 1-hour buckets into LOCAL Brisbane days client-side
-      // This avoids relying on server-side timezone support which is inconsistent
+      // Group daily UTC buckets by LOCAL date using getDate() — correct for Brisbane UTC+10
       const byDay = {};
       (sd.bucket||[]).forEach(b=>{
-        const dt = new Date(parseInt(b.startTimeMillis));
+        const dt   = new Date(parseInt(b.startTimeMillis));
         const ts   = dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');
         const disp = dt.toLocaleDateString('en-AU',{day:'numeric',month:'short'});
         let v = 0;
         (b.dataset||[]).forEach(ds=>{ (ds.point||[]).forEach(p=>{ v += (p.value?.[0]?.intVal||0); }); });
         if (v > 0) {
-          if (!byDay[ts]) byDay[ts] = {date:disp, ts, v:0};
-          byDay[ts].v += v;
+          byDay[ts] = {date:disp, ts, v:(byDay[ts]?byDay[ts].v:0)+v};
         }
       });
       const steps = Object.values(byDay).sort((a,b)=>a.ts.localeCompare(b.ts));
-      console.log('[Steps] Hourly→daily aggregation:', steps.slice(-5).map(s=>s.date+':'+s.v.toLocaleString()).join(', '));
+      console.log('[Steps] Daily buckets (local date):', steps.slice(-5).map(s=>s.date+':'+s.v.toLocaleString()).join(', '));
       if (steps.length) {
         store.set('fit_steps', steps);
         // Find TODAY's bucket specifically — not just the "latest" (which may be yesterday)
