@@ -1247,22 +1247,28 @@ async function syncGFit() {
       method:'POST', headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
       body:JSON.stringify({
         aggregateBy:[{dataTypeName:'com.google.step_count.delta'}],
-        bucketByTime:{ period:{ type:'day', value:1, timeZoneId:'Australia/Brisbane' } },
+        bucketByTime:{ durationMillis:3600000 },
         startTimeMillis:d90, endTimeMillis:now + 86400000
       })
     });
     if (sr.ok) {
       const sd = await sr.json();
-      const steps = sd.bucket.map(b=>{
-        // Sum ALL datasets — handles multiple step sources without double-counting
+      // Aggregate 1-hour buckets into LOCAL Brisbane days client-side
+      // This avoids relying on server-side timezone support which is inconsistent
+      const byDay = {};
+      (sd.bucket||[]).forEach(b=>{
+        const dt = new Date(parseInt(b.startTimeMillis));
+        const ts   = dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');
+        const disp = dt.toLocaleDateString('en-AU',{day:'numeric',month:'short'});
         let v = 0;
         (b.dataset||[]).forEach(ds=>{ (ds.point||[]).forEach(p=>{ v += (p.value?.[0]?.intVal||0); }); });
-        if (!v) return null;
-        // Use LOCAL date — critical for Brisbane UTC+10 (UTC midnight ≠ local midnight)
-        const dt = new Date(parseInt(b.startTimeMillis));
-        const ts = dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');
-        return {date:dt.toLocaleDateString('en-AU',{day:'numeric',month:'short'}), ts, v};
-      }).filter(d=>d);
+        if (v > 0) {
+          if (!byDay[ts]) byDay[ts] = {date:disp, ts, v:0};
+          byDay[ts].v += v;
+        }
+      });
+      const steps = Object.values(byDay).sort((a,b)=>a.ts.localeCompare(b.ts));
+      console.log('[Steps] Hourly→daily aggregation:', steps.slice(-5).map(s=>s.date+':'+s.v.toLocaleString()).join(', '));
       if (steps.length) {
         store.set('fit_steps', steps);
         // Find TODAY's bucket specifically — not just the "latest" (which may be yesterday)
